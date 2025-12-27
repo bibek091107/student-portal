@@ -1,5 +1,4 @@
-// Import Firebase core
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+// Import Firebase co { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 // Import Firebase Authentication
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
