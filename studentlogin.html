@@ -8,8 +8,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-  <!-- Link to CSS -->
-  <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="page-wrapper">
@@ -21,19 +20,19 @@
 
     <main>
       <div class="login-container">
-        <form class="login-form" id="loginForm">
+        <form class="login-form">
           <h2>Login</h2>
 
-          <!-- Email or Phone Input -->
+          <!-- Username (Email or Phone) -->
           <div class="input-group">
             <i class="fa fa-user"></i>
-            <input type="text" id="identifier" placeholder="Email or Phone number" required>
+            <input type="text" placeholder="Email or Phone number" required>
           </div>
 
-          <!-- Password Input -->
+          <!-- Password -->
           <div class="input-group">
             <i class="fa fa-lock"></i>
-            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" placeholder="Password" required>
           </div>
 
           <button type="submit">Login</button>
@@ -45,8 +44,7 @@
       </div>
     </main>
   </div>
-
-  <!-- Link to JS file -->
-  <script type="module" src="studentLogin.js"></script>
+  <script type="module" src="studentlogin.js"></script>
 </body>
 </html>
+
