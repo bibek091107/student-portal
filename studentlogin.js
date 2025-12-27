@@ -2,20 +2,21 @@
 import { db } from './firebase.js';
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Grab form and password input
+// Grab form and input elements
 const loginForm = document.getElementById('loginForm');
 const passwordInput = document.getElementById('password');
+const identifierInput = document.getElementById('identifier');
 
 // Login function
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const identifier = document.getElementById('identifier').value;
+  const identifier = identifierInput.value.trim();
   const password = passwordInput.value;
 
   const isPhone = /^\d+$/.test(identifier); // detect if number
   const usersRef = collection(db, "students"); // Firestore collection
   const q = isPhone
-    ? query(usersRef, where("Phone number", "==", Number(identifier))) // Firestore field exact
+    ? query(usersRef, where("Phone number", "==", Number(identifier))) // exact match Firestore field
     : query(usersRef, where("email", "==", identifier));
 
   const querySnapshot = await getDocs(q);
@@ -28,11 +29,16 @@ loginForm.addEventListener('submit', async (e) => {
   let loginSuccess = false;
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    if (data.Password === password) { // match Firestore field exactly
+    if (data.Password === password) { // match Firestore password
       loginSuccess = true;
+      // Store email or phone in localStorage for dashboard
+      if (isPhone) {
+        localStorage.setItem('userPhone', identifier);
+      } else {
+        localStorage.setItem('userEmail', identifier);
+      }
       alert("Login successful!");
-      // Store user info in localStorage/sessionStorage if needed
-      window.location.href = "dashboard.html"; // redirect to dashboard
+      window.location.href = "dashboard.html"; // Redirect
     }
   });
 
