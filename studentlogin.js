@@ -1,54 +1,57 @@
 // studentlogin.js
-import { db } from './firebase.js';
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
+  authDomain: "student-management-syste-e3edc.firebaseapp.com",
+  projectId: "student-management-syste-e3edc",
+  storageBucket: "student-management-syste-e3edc.appspot.com",
+  messagingSenderId: "674803364755",
+  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 const loginForm = document.getElementById('loginForm');
-const passwordInput = document.getElementById('password');
 const identifierInput = document.getElementById('identifier');
+const passwordInput = document.getElementById('password');
 
 loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const identifier = identifierInput.value.trim();
   const password = passwordInput.value;
 
-  const isPhone = /^\d+$/.test(identifier); // check if input is all digits
-
-  // 🔹 Correct collection name (match Firestore exactly)
-  const usersRef = collection(db, "Students"); 
-
-  // 🔹 Query based on phone or email
-  const q = isPhone
-    ? query(usersRef, where("phone", "==", identifier))
-    : query(usersRef, where("email", "==", identifier));
-
   try {
-    const querySnapshot = await getDocs(q);
+    // If user enters email, we use it directly
+    let email = identifier;
 
-    if (querySnapshot.empty) {
-      alert("User not found");
-      return;
-    }
+    // If user entered phone, we need to find email from Firestore
+    if (/^\d+$/.test(identifier)) {
+      // Search Firestore for student with this phone
+      const studentsRef = doc(db, "Students", identifier); // you can store UID = phone
+      const docSnap = await getDoc(studentsRef);
 
-    let loginSuccess = false;
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.password === password) { // field name matches Firestore
-        loginSuccess = true;
-        if (isPhone) {
-          localStorage.setItem('userPhone', identifier);
-        } else {
-          localStorage.setItem('userEmail', identifier);
-        }
-        alert("Login successful!");
-        window.location.href = "dashboard.html"; // redirect
+      if (!docSnap.exists()) {
+        alert("User not found");
+        return;
       }
-    });
 
-    if (!loginSuccess) {
-      alert("Incorrect password");
+      email = docSnap.data().email; // get email to use for Firebase Auth login
     }
-  } catch (err) {
-    console.error("Error fetching user:", err);
-    alert("Something went wrong. Check console for details.");
+
+    // Sign in with Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    alert("Login successful!");
+    localStorage.setItem("userEmail", email); // store email for dashboard
+    window.location.href = "dashboard.html";
+
+  } catch (error) {
+    console.error(error);
+    alert("Login failed: " + error.message);
   }
 });
