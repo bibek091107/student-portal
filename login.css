@@ -139,14 +139,16 @@ button[type="submit"]:hover {
   }
 }
 
- .password-group {
-      position: relative;
-    }
 
-    .password-group .fa-eye {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #333;
-    }
+.password-group {
+  position: relative; /* make the parent relative */
+}
+
+.password-group .fa-eye {
+  position: absolute; /* position relative to parent */
+  right: 10px;        /* distance from the right edge */
+  top: 50%;           /* vertically center */
+  transform: translateY(-50%); /* adjust perfectly in middle */
+  cursor: pointer;    /* show pointer on hover */
+  color: #333;
+}
