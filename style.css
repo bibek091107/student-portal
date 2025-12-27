@@ -10,11 +10,15 @@ body {
   background-color: #f9fafb; /* Light gray background */
   color: #374151; /* Dark gray text */
   line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height for centering */
 }
 
-.container {
+.page-wrapper {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0 1rem;
 }
 
@@ -23,6 +27,7 @@ header {
   background-color: #2563eb; /* Blue background */
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem; /* Space between header and main */
 }
 
 header .container {
@@ -63,12 +68,10 @@ nav a:hover {
 
 /* Main content styles */
 main {
-  padding: 2rem 1rem;
+  padding: 2rem 0;
 }
 
 .content {
-  max-width: 800px;
-  margin: 0 auto;
   text-align: center;
 }
 
@@ -96,5 +99,9 @@ main {
   
   nav a {
     padding: 0.75rem 1rem;
+  }
+  
+  .page-wrapper {
+    padding: 0 0.5rem;
   }
 }
