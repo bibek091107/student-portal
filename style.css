@@ -23,3 +23,7 @@ main {
 h1{
     align-items: left;
 }
+
+p{
+    align-items: center;
+}
