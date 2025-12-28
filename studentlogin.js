@@ -75,7 +75,7 @@ loginForm.addEventListener("submit", async (e) => {
       changePasswordContainer.style.display = "block";
     } else {
       // Already logged in → dashboard
-      window.location.href = "dashboard.html";
+      window.location.href = "student-dashboard.html";
     }
 
   } catch (error) {
