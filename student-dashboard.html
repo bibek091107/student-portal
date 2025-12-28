@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Portal</title>
+  <link rel="stylesheet" href="student-dashboard.css">
+</head>
+<body>
+
+<!-- Sidebar -->   
+<div class="sidebar">
+  <h2>Student Portal</h2>
+   <ul>
+    <li onclick="location.href='home.html'">🏠 Home</li>
+    <li onclick="location.href='profile.html'">👤 Profile</li>
+    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
+    <li onclick="location.href='courses.html'">📚 Courses</li>
+    <li onclick="location.href='notices.html'">📢 Notices</li>
+  </ul>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h3 id="welcomeText">Welcome</h3>
+    <div class="nav-right">
+      <!-- USER ICON INSTEAD OF IMAGE -->
+      <span class="nav-profile">👤</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="section">
+
+    <!-- Top Cards -->
+    <div class="dashboard-cards">
+
+      <div class="dash-card">
+        <h4>ATTENDANCE</h4>
+        <div class="circle" id="attendanceCircle">
+          <span id="attendanceText">82%</span>
+        </div>
+        <div class="legend">
+          <span class="green"></span> Present
+          <span class="red"></span> Absent
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h4>OVERALL PERFORMANCE</h4>
+        <h2 class="good">Good</h2>
+      </div>
+
+      <div class="dash-card">
+        <h4>TOTAL COURSES</h4>
+        <h2 class="blue">6</h2>
+      </div>
+
+    </div>
+
+    <!-- Student Profile -->
+    <div class="wide-card">
+      <h3>Student Profile</h3>
+      <table class="profile-table">
+        <tr><td>Student Name</td><td id="profileName">Loading...</td></tr>
+        <tr><td>Student ID</td><td>720466</td></tr>
+        <tr><td>Register No.</td><td>RA2511003050529</td></tr>
+        <tr><td>Email ID</td><td id="profileEmail">Loading...</td></tr>
+        <tr><td>Institution</td><td>College of Engineering and Technology, Tiruchirappalli</td></tr>
+        <tr><td>Program</td><td>B.Tech Computer Science and Engineering</td></tr>
+      </table>
+    </div>
+
+    <!-- Notices -->
+    <div class="wide-card">
+      <h3>RECENT NOTICES</h3>
+      <ul>
+        <li>📌 Mid-term exams start from July 20</li>
+        <li>📌 Project submission deadline extended</li>
+        <li>📌 Attendance below 75% will be penalized</li>
+      </ul>
+    </div>
+
+  </section>
+</div>
+
+<script type="module" src="student-dashboard.js"></script>
+</body>
+</html>
