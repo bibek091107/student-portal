@@ -9,7 +9,7 @@
 <body>
   <div class="dashboard-wrapper">
     <header class="top-bar">
-      <h1>Welcome, <span id="teacherName">Teacher</span></h1>
+      <h1>Welcome, <span id="teacherName">Loading...</span></h1>
     </header>
   </div>
 
@@ -29,14 +29,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const teacherId = localStorage.getItem("teacherId"); 
-    if (!teacherId) location.href = "teacherlogin.html";
+    // Get the teacher document ID stored in localStorage
+    const teacherId = localStorage.getItem("teacherDocId"); 
+
+    if (!teacherId) {
+      // If no teacher ID found, redirect to login
+      window.location.href = "teacherlogin.html";
+    }
 
     async function loadTeacherName() {
-      const teacherRef = doc(db, "Teachers", teacherId);
-      const teacherSnap = await getDoc(teacherRef);
-      if (teacherSnap.exists()) {
-        document.getElementById("teacherName").textContent = teacherSnap.data().name;
+      try {
+        const teacherRef = doc(db, "Teachers", teacherId);
+        const teacherSnap = await getDoc(teacherRef);
+        if (teacherSnap.exists()) {
+          const teacherData = teacherSnap.data();
+          document.getElementById("teacherName").textContent = teacherData.name;
+        } else {
+          document.getElementById("teacherName").textContent = "Unknown Teacher";
+        }
+      } catch (error) {
+        console.error("Error fetching teacher data:", error);
+        document.getElementById("teacherName").textContent = "Error loading name";
       }
     }
 
