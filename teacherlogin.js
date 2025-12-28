@@ -19,12 +19,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Ensure session persists
 setPersistence(auth, browserLocalPersistence);
 
 // Elements
 const loginForm = document.getElementById("loginForm");
 const identifierInput = document.getElementById("identifier");
 const passwordInput = document.getElementById("password");
+
 const loginContainer = document.getElementById("loginContainer");
 const changePasswordContainer = document.getElementById("changePasswordContainer");
 const changePasswordForm = document.getElementById("changePasswordForm");
@@ -33,7 +36,7 @@ const confirmPasswordInput = document.getElementById("confirmPassword");
 
 let currentUserEmail = "";
 
-// ----- LOGIN -----
+// ---- LOGIN ----
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const identifier = identifierInput.value.trim();
@@ -42,7 +45,7 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // Phone number entered → find email
+    // If phone number entered, find email in Firestore
     if (/^\d+$/.test(identifier)) {
       const q = query(collection(db, "Teachers"), where("phone", "==", identifier));
       const snapshot = await getDocs(q);
@@ -53,35 +56,33 @@ loginForm.addEventListener("submit", async (e) => {
       email = snapshot.docs[0].data().email;
     }
 
-    // Firebase Auth login
+    // Sign in via Firebase Auth
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     currentUserEmail = email;
 
-    // Fetch teacher record
-    const q = query(collection(db, "Teachers"), where("email", "==", email));
-    const snapshot = await getDocs(q);
-    const teacherDoc = snapshot.docs[0];
-    const teacherData = teacherDoc.data();
-
-    localStorage.setItem("teacherEmail", email);
-    localStorage.setItem("teacherName", teacherData.name);
+    // Get teacher record
+    const q2 = query(collection(db, "Teachers"), where("email", "==", email));
+    const teacherSnap = await getDocs(q2);
+    const teacherData = teacherSnap.docs[0].data();
 
     if (teacherData.firstLogin === true) {
+      // Show change password form
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
       window.location.href = "teacher-dashboard.html";
     }
 
-  } catch (err) {
-    console.error(err);
-    alert("Login failed: " + err.message);
+  } catch (error) {
+    console.error(error);
+    alert("Login failed: " + error.message);
   }
 });
 
-// ----- CHANGE PASSWORD -----
+// ---- CHANGE PASSWORD ----
 changePasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const newPassword = newPasswordInput.value.trim();
   const confirmPassword = confirmPasswordInput.value.trim();
 
@@ -98,7 +99,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
   try {
     const user = auth.currentUser;
     if (!user) {
-      alert("User session expired. Please login again.");
+      alert("Session expired. Please login again.");
       window.location.href = "teacherlogin.html";
       return;
     }
@@ -106,7 +107,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
     // Update Firebase Auth password
     await updatePassword(user, newPassword);
 
-    // Update firstLogin = false
+    // Update Firestore firstLogin = false
     const q = query(collection(db, "Teachers"), where("email", "==", currentUserEmail));
     const snapshot = await getDocs(q);
     const teacherDoc = snapshot.docs[0];
