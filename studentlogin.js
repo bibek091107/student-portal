@@ -119,7 +119,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
     await updateDoc(doc(db, "Students", studentDoc.id), { firstLogin: false });
 
     alert("Password updated successfully!");
-    window.location.href = "dashboard.html";
+    window.location.href = "student-dashboard.html";
 
   } catch (err) {
     console.error(err);
