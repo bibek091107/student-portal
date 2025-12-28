@@ -2,58 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
-  <div class="dashboard-wrapper">
-    <header class="top-bar">
-      <h1>Welcome, <span id="teacherName">Loading...</span></h1>
-    </header>
-  </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <h1 id="welcomeText">Welcome</h1>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
-      authDomain: "student-management-syste-e3edc.firebaseapp.com",
-      projectId: "student-management-syste-e3edc",
-      storageBucket: "student-management-syste-e3edc.appspot.com",
-      messagingSenderId: "674803364755",
-      appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Get the teacher document ID stored in localStorage
-    const teacherId = localStorage.getItem("teacherDocId"); 
-
-    if (!teacherId) {
-      // If no teacher ID found, redirect to login
-      window.location.href = "teacherlogin.html";
-    }
-
-    async function loadTeacherName() {
-      try {
-        const teacherRef = doc(db, "Teachers", teacherId);
-        const teacherSnap = await getDoc(teacherRef);
-        if (teacherSnap.exists()) {
-          const teacherData = teacherSnap.data();
-          document.getElementById("teacherName").textContent = teacherData.name;
-        } else {
-          document.getElementById("teacherName").textContent = "Unknown Teacher";
-        }
-      } catch (error) {
-        console.error("Error fetching teacher data:", error);
-        document.getElementById("teacherName").textContent = "Error loading name";
-      }
-    }
-
-    loadTeacherName();
-  </script>
+  <script type="module" src="teacher-dashboard.js"></script>
 </body>
 </html>
