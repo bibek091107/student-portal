@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <header class="top-bar">
+      <h1>Welcome, <span id="teacherName">Teacher</span></h1>
+    </header>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
+      authDomain: "student-management-syste-e3edc.firebaseapp.com",
+      projectId: "student-management-syste-e3edc",
+      storageBucket: "student-management-syste-e3edc.appspot.com",
+      messagingSenderId: "674803364755",
+      appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Assume teacherId is stored in localStorage after login
+    const teacherId = localStorage.getItem("teacherId"); 
+
+    async function loadTeacherName() {
+      if (!teacherId) return;
+      const teacherRef = doc(db, "Teachers", teacherId);
+      const teacherSnap = await getDoc(teacherRef);
+      if (teacherSnap.exists()) {
+        document.getElementById("teacherName").textContent = teacherSnap.data().name;
+      }
+    }
+
+    loadTeacherName();
+  </script>
+</body>
+</html>
