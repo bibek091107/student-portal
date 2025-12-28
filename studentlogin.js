@@ -1,18 +1,7 @@
 // studentlogin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, 
-  signInWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, 
-  doc, 
-  getDoc, 
-  query, 
-  where, 
-  collection, 
-  getDocs 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -41,13 +30,12 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // If phone number entered → find email from Firestore
+    // 🔹 Optional: support phone lookup (only if you want)
     if (/^\d+$/.test(identifier)) {
       const q = query(
         collection(db, "Students"),
-        where("phone", "==", identifier)
+        where("phone", "==", Number(identifier)) // phone stored as Number
       );
-
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
@@ -55,31 +43,27 @@ loginForm.addEventListener("submit", async (e) => {
         return;
       }
 
-      email = querySnapshot.docs[0].data().email;
+      email = querySnapshot.docs[0].data().email; // get email to login
     }
 
-    // Firebase Auth login
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
+    // 🔹 Firebase Auth login (email only)
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    // 🔹 Fetch student document by querying email (not UID)
+    const q = query(
+      collection(db, "Students"),
+      where("email", "==", email)
     );
+    const snapshot = await getDocs(q);
 
-    const uid = userCredential.user.uid;
-
-    // Fetch student document
-    const studentRef = doc(db, "Students", uid);
-    const studentSnap = await getDoc(studentRef);
-
-    if (!studentSnap.exists()) {
+    if (snapshot.empty) {
       alert("Student record not found");
       return;
     }
 
-    const studentData = studentSnap.data();
+    const studentData = snapshot.docs[0].data();
 
-    // Save session info
-    localStorage.setItem("uid", uid);
+    // 🔹 Save session info
     localStorage.setItem("userEmail", email);
 
     // 🔒 Force password change on first login
