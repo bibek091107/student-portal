@@ -1,10 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, signInWithEmailAndPassword, updatePassword, setPersistence, browserLocalPersistence 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, collection, query, where, getDocs, doc, updateDoc 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, updatePassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -20,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Ensure session persists
+// Persist login
 setPersistence(auth, browserLocalPersistence);
 
 // Elements
@@ -34,7 +30,7 @@ const changePasswordForm = document.getElementById("changePasswordForm");
 const newPasswordInput = document.getElementById("newPassword");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 
-let currentUserEmail = "";
+let currentTeacherDocId = "";
 
 // ---- LOGIN ----
 loginForm.addEventListener("submit", async (e) => {
@@ -45,44 +41,55 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // If phone number entered, find email in Firestore
+    // If phone number entered → get email from Firestore
     if (/^\d+$/.test(identifier)) {
       const q = query(collection(db, "Teachers"), where("phone", "==", identifier));
-      const snapshot = await getDocs(q);
-      if (snapshot.empty) {
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
         alert("Teacher not found");
         return;
       }
-      email = snapshot.docs[0].data().email;
+      const teacherDoc = querySnapshot.docs[0];
+      email = teacherDoc.data().email;
+      currentTeacherDocId = teacherDoc.id;
+    } else {
+      // If email entered → get document
+      const q = query(collection(db, "Teachers"), where("email", "==", identifier));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
+        alert("Teacher not found");
+        return;
+      }
+      const teacherDoc = querySnapshot.docs[0];
+      currentTeacherDocId = teacherDoc.id;
     }
 
-    // Sign in via Firebase Auth
+    // Firebase Auth login
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    currentUserEmail = email;
 
-    // Get teacher record
-    const q2 = query(collection(db, "Teachers"), where("email", "==", email));
-    const teacherSnap = await getDocs(q2);
+    // Get teacher data
+    const teacherRef = doc(db, "Teachers", currentTeacherDocId);
+    const teacherSnap = await getDocs(query(collection(db, "Teachers"), where("email", "==", email)));
     const teacherData = teacherSnap.docs[0].data();
 
+    // Force password change if firstLogin = true
     if (teacherData.firstLogin === true) {
-      // Show change password form
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
+      localStorage.setItem("teacherId", currentTeacherDocId);
       window.location.href = "teacher-dashboard.html";
     }
 
-  } catch (error) {
-    console.error(error);
-    alert("Login failed: " + error.message);
+  } catch (err) {
+    console.error(err);
+    alert("Login failed: " + err.message);
   }
 });
 
 // ---- CHANGE PASSWORD ----
 changePasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const newPassword = newPasswordInput.value.trim();
   const confirmPassword = confirmPasswordInput.value.trim();
 
@@ -99,7 +106,7 @@ changePasswordForm.addEventListener("submit", async (e) => {
   try {
     const user = auth.currentUser;
     if (!user) {
-      alert("Session expired. Please login again.");
+      alert("Session expired, please login again.");
       window.location.href = "teacherlogin.html";
       return;
     }
@@ -107,11 +114,11 @@ changePasswordForm.addEventListener("submit", async (e) => {
     // Update Firebase Auth password
     await updatePassword(user, newPassword);
 
-    // Update Firestore firstLogin = false
-    const q = query(collection(db, "Teachers"), where("email", "==", currentUserEmail));
-    const snapshot = await getDocs(q);
-    const teacherDoc = snapshot.docs[0];
-    await updateDoc(doc(db, "Teachers", teacherDoc.id), { firstLogin: false });
+    // Update firstLogin = false in Firestore
+    await updateDoc(doc(db, "Teachers", currentTeacherDocId), { firstLogin: false });
+
+    // Store teacherId for dashboard
+    localStorage.setItem("teacherId", currentTeacherDocId);
 
     alert("Password updated successfully!");
     window.location.href = "teacher-dashboard.html";

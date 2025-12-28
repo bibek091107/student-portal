@@ -29,11 +29,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Assume teacherId is stored in localStorage after login
     const teacherId = localStorage.getItem("teacherId"); 
+    if (!teacherId) location.href = "teacherlogin.html";
 
     async function loadTeacherName() {
-      if (!teacherId) return;
       const teacherRef = doc(db, "Teachers", teacherId);
       const teacherSnap = await getDoc(teacherRef);
       if (teacherSnap.exists()) {
