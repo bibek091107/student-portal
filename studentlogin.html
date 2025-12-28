@@ -7,29 +7,27 @@
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
   <link rel="stylesheet" href="login.css">
 </head>
 <body>
   <div class="page-wrapper">
     <header>
       <div class="container">
-        <h1>Student Login</h1>
+        <h1>Student Portal</h1>
       </div>
     </header>
 
     <main>
-      <div class="login-container">
+      <!-- Login Form -->
+      <div class="login-container" id="loginContainer">
         <form class="login-form" id="loginForm">
           <h2>Login</h2>
 
-          <!-- Username (Email or Phone) -->
           <div class="input-group">
             <i class="fa fa-user"></i>
             <input type="text" id="identifier" placeholder="Email or Phone number" required>
           </div>
 
-          <!-- Password -->
           <div class="input-group">
             <i class="fa fa-lock"></i>
             <input type="password" id="password" placeholder="Password" required>
@@ -40,6 +38,25 @@
           <p class="back-link">
             <a href="index.html">← Back to Home</a>
           </p>
+        </form>
+      </div>
+
+      <!-- Change Password Form (hidden initially) -->
+      <div class="login-container" id="changePasswordContainer" style="display:none;">
+        <form id="changePasswordForm">
+          <h2>Set New Password</h2>
+
+          <div class="input-group">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="newPassword" placeholder="Enter new password" required>
+          </div>
+
+          <div class="input-group">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="confirmPassword" placeholder="Confirm new password" required>
+          </div>
+
+          <button type="submit">Update Password</button>
         </form>
       </div>
     </main>
