@@ -1,4 +1,4 @@
-// studentlogin.js
+/// studentlogin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
   getAuth, signInWithEmailAndPassword, updatePassword, setPersistence, browserLocalPersistence 
@@ -17,6 +17,7 @@ const firebaseConfig = {
   appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -24,7 +25,7 @@ const db = getFirestore(app);
 // Ensure Auth session persists
 setPersistence(auth, browserLocalPersistence);
 
-// Elements
+// HTML Elements
 const loginForm = document.getElementById("loginForm");
 const identifierInput = document.getElementById("identifier");
 const passwordInput = document.getElementById("password");
@@ -55,7 +56,13 @@ loginForm.addEventListener("submit", async (e) => {
         return;
       }
 
-      email = querySnapshot.docs[0].data().email;
+      const studentDoc = querySnapshot.docs[0];
+      if (!studentDoc) {
+        alert("User record not found");
+        return;
+      }
+
+      email = studentDoc.data().Email; // ✅ Correct capitalization
     }
 
     // Firebase Auth login
@@ -63,10 +70,21 @@ loginForm.addEventListener("submit", async (e) => {
     const user = userCredential.user;
     currentUserEmail = email;
 
-    // Get student record from Firestore
-    const q = query(collection(db, "Students"), where("email", "==", email));
+    // Get student record from Firestore by Email
+    const q = query(collection(db, "Students"), where("Email", "==", email));
     const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      alert("Student record not found");
+      return;
+    }
+
     const studentDoc = snapshot.docs[0];
+    if (!studentDoc) {
+      alert("Student record undefined");
+      return;
+    }
+
     const studentData = studentDoc.data();
 
     if (studentData.firstLogin === true) {
@@ -113,8 +131,14 @@ changePasswordForm.addEventListener("submit", async (e) => {
     await updatePassword(user, newPassword);
 
     // Update firstLogin = false in Firestore
-    const q = query(collection(db, "Students"), where("email", "==", currentUserEmail));
+    const q = query(collection(db, "Students"), where("Email", "==", currentUserEmail));
     const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      alert("Student record not found");
+      return;
+    }
+
     const studentDoc = snapshot.docs[0];
     await updateDoc(doc(db, "Students", studentDoc.id), { firstLogin: false });
 
