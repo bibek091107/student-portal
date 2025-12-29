@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -24,7 +24,6 @@ const studentIdEl = document.getElementById("profileStudentId");
 const regNoEl = document.getElementById("profileRegNo");
 const programEl = document.getElementById("profileProgram");
 
-// Listen for auth state
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
@@ -32,11 +31,12 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
-    // Firestore doc based on uid
-    const docRef = doc(db, "Students", user.uid);
-    const snap = await getDoc(docRef);
+    // 🔹 Query Students collection by email
+    const studentsRef = collection(db, "Students");
+    const q = query(studentsRef, where("Email", "==", user.email));
+    const querySnapshot = await getDocs(q);
 
-    if (!snap.exists()) {
+    if (querySnapshot.empty) {
       welcomeEl.innerText = "Welcome";
       nameEl.innerText = "Profile not found";
       emailEl.innerText = user.email;
@@ -46,16 +46,16 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    const data = snap.data();
+    // 🔹 Use the first matched document
+    const data = querySnapshot.docs[0].data();
 
-    // ✅ Fetch all fields from Firestore
+    // Update dashboard fields
     const name = data["Name"] || "Student";
     const email = data["Email"] || user.email;
     const studentId = data["Student Id/Teacher ID"] || "-";
     const regNo = data["Reg No."] || "-";
     const program = data["Program/Course"] || "-";
 
-    // Update dashboard
     welcomeEl.innerText = `Welcome, ${name}`;
     nameEl.innerText = name;
     emailEl.innerText = email;
