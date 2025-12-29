@@ -16,7 +16,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ✅ HTML elements
+// HTML elements
 const welcomeEl = document.getElementById("welcomeText");
 const nameEl = document.getElementById("profileName");
 const emailEl = document.getElementById("profileEmail");
@@ -31,12 +31,13 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
-    // 🔹 Query Students collection by email
+    // 🔹 Query Students collection by Email field
     const studentsRef = collection(db, "Students");
     const q = query(studentsRef, where("Email", "==", user.email));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
+      // No profile found
       welcomeEl.innerText = "Welcome";
       nameEl.innerText = "Profile not found";
       emailEl.innerText = user.email;
@@ -46,25 +47,19 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // 🔹 Use the first matched document
+    // Use the first matched document
     const data = querySnapshot.docs[0].data();
 
-    // Update dashboard fields
-    const name = data["Name"] || "Student";
-    const email = data["Email"] || user.email;
-    const studentId = data["Student Id/Teacher ID"] || "-";
-    const regNo = data["Reg No."] || "-";
-    const program = data["Program/Course"] || "-";
-
-    welcomeEl.innerText = `Welcome, ${name}`;
-    nameEl.innerText = name;
-    emailEl.innerText = email;
-    studentIdEl.innerText = studentId;
-    regNoEl.innerText = regNo;
-    programEl.innerText = program;
+    // 🔹 Update dashboard fields dynamically
+    welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
+    nameEl.innerText = data["Name"] || "Student";
+    emailEl.innerText = data["Email"] || user.email;
+    studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
+    regNoEl.innerText = data["Reg No."] || "-";
+    programEl.innerText = data["Program/Course"] || "-";
 
   } catch (error) {
-    console.error(error);
+    console.error("Error loading student profile:", error);
     welcomeEl.innerText = "Welcome";
     nameEl.innerText = "Error loading name";
     emailEl.innerText = "Error loading email";
