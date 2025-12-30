@@ -1,3 +1,4 @@
+// student-dashboard.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -15,6 +16,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Elements
 const welcomeEl = document.getElementById("welcomeText");
 const nameEl = document.getElementById("profileName");
 const emailEl = document.getElementById("profileEmail");
@@ -30,6 +32,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
+    // 🔥 THIS IS THE FIX — get document by UID
     const studentRef = doc(db, "Students", user.uid);
     const studentSnap = await getDoc(studentRef);
 
@@ -45,18 +48,20 @@ onAuthStateChanged(auth, async (user) => {
 
     const data = studentSnap.data();
 
-    welcomeEl.innerText = `Welcome, ${data.Name || "Student"}`;
-    nameEl.innerText = data.Name || "-";
-    emailEl.innerText = data.Email || user.email;
+    welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
+    nameEl.innerText = data["Name"] || "-";
+    emailEl.innerText = data["Email"] || user.email;
     studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
     regNoEl.innerText = data["Reg No."] || "-";
     programEl.innerText = data["Program/Course"] || "-";
 
   } catch (err) {
     console.error(err);
+    nameEl.innerText = "Error loading profile";
   }
 });
 
+// Logout
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "studentlogin.html";
