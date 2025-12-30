@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Courses</title>
+  <link rel="stylesheet" href="student-dashboard.css">
+
+  <style>
+    .course-img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .semester-title {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h2>Student Portal</h2>
+  <ul>
+    <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
+    <li onclick="location.href='profile.html'">👤 Profile</li>
+    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
+    <li onclick="location.href='courses.html'">📚 Courses</li>
+    <li onclick="location.href='notices.html'">📢 Notices</li>
+     <li id="logoutBtn">🚪 Logout</li>
+  </ul>
+</div>
+
+<div class="main">
+  <div class="navbar">
+    <h3>My Courses</h3>
+  </div>
+
+  <section class="section">
+
+    <!-- CURRENT SEMESTER COURSES -->
+    <h4 class="semester-title">📘 Current Semester (Enrolled Courses)</h4>
+
+    <div class="dashboard-cards">
+
+      <div class="dash-card">
+        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c" class="course-img">
+        <h4>Data Structures</h4>
+        <p>Course Code: CSE201</p>
+        <p>Credit Hours: 4</p>
+      </div>
+
+      <div class="dash-card">
+        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475" class="course-img">
+        <h4>Operating Systems</h4>
+        <p>Course Code: CSE202</p>
+        <p>Credit Hours: 3</p>
+      </div>
+
+      <div class="dash-card">
+        <img src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72" class="course-img">
+        <h4>Python Programming</h4>
+        <p>Course Code: CSE203</p>
+        <p>Credit Hours: 3</p>
+      </div>
+
+      <div class="dash-card">
+        <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904" class="course-img">
+        <h4>Engineering Mathematics</h4>
+        <p>Course Code: MAT201</p>
+        <p>Credit Hours: 4</p>
+      </div>
+
+    </div>
+
+    <!-- REMAINING SEMESTERS -->
+    <h4 class="semester-title">📙 Remaining Semester Courses</h4>
+
+    <div class="wide-card">
+      <table class="profile-table">
+
+        <tr>
+          <td><strong>Semester</strong></td>
+          <td><strong>Course Code</strong></td>
+          <td><strong>Course Name</strong></td>
+        </tr>
+
+        <!-- SEM 3 -->
+        <tr>
+          <td rowspan="3">Semester 3</td>
+          <td>CSE301</td>
+          <td>Database Management Systems</td>
+        </tr>
+        <tr>
+          <td>CSE302</td>
+          <td>Computer Networks</td>
+        </tr>
+        <tr>
+          <td>MAT301</td>
+          <td>Discrete Mathematics</td>
+        </tr>
+
+        <!-- SEM 4 -->
+        <tr>
+          <td rowspan="3">Semester 4</td>
+          <td>CSE401</td>
+          <td>Design & Analysis of Algorithms</td>
+        </tr>
+        <tr>
+          <td>CSE402</td>
+          <td>Software Engineering</td>
+        </tr>
+        <tr>
+          <td>CSE403</td>
+          <td>Microprocessors</td>
+        </tr>
+
+        <!-- SEM 5 -->
+        <tr>
+          <td rowspan="3">Semester 5</td>
+          <td>CSE501</td>
+          <td>Artificial Intelligence</td>
+        </tr>
+        <tr>
+          <td>CSE502</td>
+          <td>Web Technologies</td>
+        </tr>
+        <tr>
+          <td>CSE503</td>
+          <td>Compiler Design</td>
+        </tr>
+
+      </table>
+    </div>
+
+  </section>
+</div>
+<script src="common.js"></script>
+<script src="course.js"></script>
+</body>
+</html>
