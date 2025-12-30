@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance</title>
+  <link rel="stylesheet" href="student-dashboard.css">
+
+  <style>
+    /* ---------- Attendance Hover Tooltip ---------- */
+    .circle-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .attendance-tooltip {
+      position: absolute;
+      bottom: -55px;
+      background: #111827;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* ---------- Vertical Bar Chart ---------- */
+    .vertical-chart {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 220px;
+      margin-top: 20px;
+    }
+
+    .v-bar-box {
+      text-align: center;
+      width: 60px;
+    }
+
+    .v-bar {
+      background: #e5e7eb;
+      height: 180px;
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .v-bar-fill {
+      width: 100%;
+      background: #22c55e;
+      border-radius: 10px 10px 0 0;
+      color: white;
+      font-size: 12px;
+      text-align: center;
+      padding-top: 5px;
+    }
+
+    .v-label {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .attendance-top {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Student Portal</h2>
+  <ul>
+    <li onclick="location.href='home.html'">🏠 Home</li>
+    <li onclick="location.href='profile.html'">👤 Profile</li>
+    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
+    <li onclick="location.href='courses.html'">📚 Courses</li>
+    <li onclick="location.href='notices.html'">📢 Notices</li>
+    <li id="logoutBtn">🚪 Logout</li>
+  </ul>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <div class="navbar">
+    <h3>Attendance Details</h3>
+  </div>
+
+  <section class="section">
+
+    <!-- TOP SECTION -->
+    <div class="wide-card attendance-top">
+
+      <!-- Overall Attendance -->
+      <div>
+        <h4 style="text-align:center;">Overall Attendance</h4>
+
+        <div class="circle-wrapper">
+          <div class="circle" id="attendanceCircle">
+            <span id="attendancePercent">82%</span>
+          </div>
+
+          <div class="attendance-tooltip" id="attendanceTooltip">
+            Present: 0 Days<br>
+            Absent: 0 Days
+          </div>
+        </div>
+
+        <div class="legend">
+          <span class="green"></span> Present
+          <span class="red"></span> Absent
+        </div>
+      </div>
+
+      <!-- Vertical Bar Chart -->
+      <div>
+        <h4>Subject-wise Attendance</h4>
+
+        <div class="vertical-chart">
+
+          <div class="v-bar-box">
+            <div class="v-bar">
+              <div class="v-bar-fill" style="height:85%;">85%</div>
+            </div>
+            <div class="v-label">DS</div>
+          </div>
+
+          <div class="v-bar-box">
+            <div class="v-bar">
+              <div class="v-bar-fill" style="height:80%;">80%</div>
+            </div>
+            <div class="v-label">OS</div>
+          </div>
+
+          <div class="v-bar-box">
+            <div class="v-bar">
+              <div class="v-bar-fill" style="height:78%;">78%</div>
+            </div>
+            <div class="v-label">Maths</div>
+          </div>
+
+          <div class="v-bar-box">
+            <div class="v-bar">
+              <div class="v-bar-fill" style="height:90%;">90%</div>
+            </div>
+            <div class="v-label">Python</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="wide-card">
+      <h3>Detailed Attendance Table</h3>
+
+      <table class="profile-table">
+        <tr>
+          <td><strong>Subject</strong></td>
+          <td><strong>Classes Attended</strong></td>
+          <td><strong>Total Classes</strong></td>
+          <td><strong>Percentage</strong></td>
+        </tr>
+        <tr>
+          <td>Data Structures</td>
+          <td>34</td>
+          <td>40</td>
+          <td>85%</td>
+        </tr>
+        <tr>
+          <td>Operating Systems</td>
+          <td>32</td>
+          <td>40</td>
+          <td>80%</td>
+        </tr>
+        <tr>
+          <td>Mathematics</td>
+          <td>28</td>
+          <td>36</td>
+          <td>78%</td>
+        </tr>
+        <tr>
+          <td>Python Programming</td>
+          <td>27</td>
+          <td>30</td>
+          <td>90%</td>
+        </tr>
+      </table>
+    </div>
+
+  </section>
+</div>
+
+<!-- JAVASCRIPT -->
+<script src="attendance.js"></script>
+<script src="common.js"></script>
+
+</body>
+</html>
