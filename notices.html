@@ -1,11 +1,12 @@
+<!-- notices.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Notices</title>
-  <link rel="stylesheet" href="notice.css">
-
+  <title>Notices - Student Portal</title>
+  <link rel="stylesheet" href="student-dashboard.css">
   <style>
+    /* Specific styles for tags in notices */
     .tag {
       padding: 4px 8px;
       border-radius: 6px;
@@ -30,6 +31,11 @@
     .view-link:hover {
       text-decoration: underline;
     }
+
+    /* Adjust table spacing */
+    .profile-table td, .profile-table th {
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
@@ -41,27 +47,32 @@
     <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
     <li onclick="location.href='profile.html'">👤 Profile</li>
     <li onclick="location.href='attendance.html'">📊 Attendance</li>
-    <li onclick="location.href='results.html'">📝 Grade/Mark</li>
+    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
     <li onclick="location.href='courses.html'">📚 Courses</li>
     <li onclick="location.href='notices.html'">📢 Notices</li>
     <li id="logoutBtn">🚪 Logout</li>
   </ul>
 </div>
 
-<!-- Main -->
+<!-- Main Content -->
 <div class="main">
+  <!-- Navbar -->
   <div class="navbar">
-    <h3>Notices & Announcements</h3>
+    <h3>Recent Notices</h3>
+    <div class="nav-right">
+      <span class="nav-profile">👤</span>
+    </div>
   </div>
 
+  <!-- Notices Section -->
   <section class="section">
     <div class="wide-card">
       <table class="profile-table">
         <tr>
-          <td><strong>Date</strong></td>
-          <td><strong>Notice</strong></td>
-          <td><strong>Category</strong></td>
-          <td><strong>Action</strong></td>
+          <th>Date</th>
+          <th>Notice</th>
+          <th>Category</th>
+          <th>Action</th>
         </tr>
 
         <tr>
@@ -91,14 +102,13 @@
           <td><span class="tag general">General</span></td>
           <td><a href="#" class="view-link">View</a></td>
         </tr>
-
       </table>
     </div>
   </section>
 </div>
 
-<script src="notice.js"></script>
 <script src="common.js"></script>
+  <script src= "notice.js"></script>
 
 </body>
 </html>
