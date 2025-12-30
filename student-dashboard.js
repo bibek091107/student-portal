@@ -1,7 +1,17 @@
 // student-dashboard.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
@@ -12,6 +22,7 @@ const firebaseConfig = {
   appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
 };
 
+// Init
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -25,38 +36,44 @@ const regNoEl = document.getElementById("profileRegNo");
 const programEl = document.getElementById("profileProgram");
 const logoutBtn = document.getElementById("logoutBtn");
 
+// Auth check
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
     return;
   }
 
-  try {
-    // 🔥 THIS IS THE FIX — get document by UID
-    const studentRef = doc(db, "Students", user.uid);
-    const studentSnap = await getDoc(studentRef);
+  emailEl.innerText = user.email;
 
-    if (!studentSnap.exists()) {
+  try {
+    // 🔥 SEARCH STUDENT BY EMAIL
+    const q = query(
+      collection(db, "Students"),
+      where("Email", "==", user.email)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
       welcomeEl.innerText = "Welcome";
       nameEl.innerText = "Profile not found";
-      emailEl.innerText = user.email;
       studentIdEl.innerText = "-";
       regNoEl.innerText = "-";
       programEl.innerText = "-";
       return;
     }
 
-    const data = studentSnap.data();
+    // Take first matching document
+    const data = snapshot.docs[0].data();
 
     welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
     nameEl.innerText = data["Name"] || "-";
-    emailEl.innerText = data["Email"] || user.email;
     studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
     regNoEl.innerText = data["Reg No."] || "-";
     programEl.innerText = data["Program/Course"] || "-";
 
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
+    console.error(error);
     nameEl.innerText = "Error loading profile";
   }
 });
