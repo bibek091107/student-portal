@@ -1,4 +1,3 @@
-<!-- student-dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,18 +7,16 @@
 </head>
 <body>
 
-<!-- Sidebar -->   
+<!-- Sidebar -->
 <div class="sidebar">
   <h2>Student Portal</h2>
   <ul>
-    <li onclick="location.href='home.html'">🏠 Home</li>
-    <li onclick="location.href='profile.html'">👤 Profile</li>
-    <li onclick="location.href='attendance.html'">📊 Attendance</li>
-    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
-    <li onclick="location.href='courses.html'">📚 Courses</li>
-    <li onclick="location.href='notices.html'">📢 Notices</li>
-
-    <!-- LOGOUT BUTTON (ADDED ONLY) -->
+    <li data-section="home" class="active">🏠 Home</li>
+    <li data-section="profile">👤 Profile</li>
+    <li data-section="attendance">📊 Attendance</li>
+    <li data-section="grades">📝 Grade/Marks</li>
+    <li data-section="courses">📚 Courses</li>
+    <li data-section="notices">📢 Notices</li>
     <li id="logoutBtn">🚪 Logout</li>
   </ul>
 </div>
@@ -36,60 +33,35 @@
   </div>
 
   <!-- HOME -->
-  <section id="home" class="section">
-
-    <!-- Top Cards -->
-    <div class="dashboard-cards">
-      <div class="dash-card">
-        <!-- Attendance -->
-      <div class="dash-card">
-        <h4>ATTENDANCE</h4>
-
-        <div class="circle" id="attendanceCircle">
-          <span id="attendanceText">82%</span>
-        </div>
-
-        <div class="legend">
-          <span class="green"></span> Present
-          <span class="red"></span> Absent
-        </div>
-      </div>
-
-
-      <div class="dash-card">
-        <h4>OVERALL PERFORMANCE</h4>
-        <h2 class="good">Good</h2>
-      </div>
-
-      <div class="dash-card">
-        <h4>TOTAL COURSES</h4>
-        <h2 class="blue">6</h2>
-      </div>
-    </div>
-
-    <!-- Student Profile -->
-    <div class="wide-card">
-      <h3>Student Profile</h3>
-      <table class="profile-table">
-        <tr><td>Student Name</td><td id="profileName">Loading...</td></tr>
-        <tr><td>Student ID</td><td id="profileStudentId">Loading...</td></tr>
-        <tr><td>Register No.</td><td id="profileRegNo">Loading...</td></tr>
-        <tr><td>Email ID</td><td id="profileEmail">Loading...</td></tr>
-        <tr><td>Program</td><td id="profileProgram">Loading...</td></tr>
-      </table>
-    </div>
-
-    <!-- Notices -->
-    <div class="wide-card">
-      <h3>RECENT NOTICES</h3>
-      <ul>
-        <li>📌 Mid-term exams start from July 20</li>
-        <li>📌 Project submission deadline extended</li>
-        <li>📌 Attendance below 75% will be penalized</li>
-      </ul>
-    </div>
-
+  <section id="home" class="section active">
+    <!-- your existing HOME content here -->
   </section>
+
+  <!-- PROFILE -->
+  <section id="profile" class="section">
+    PROFILE CONTENT
+  </section>
+
+  <!-- ATTENDANCE -->
+  <section id="attendance" class="section">
+    ATTENDANCE CONTENT
+  </section>
+
+  <!-- GRADES -->
+  <section id="grades" class="section">
+    GRADES CONTENT
+  </section>
+
+  <!-- COURSES -->
+  <section id="courses" class="section">
+    COURSES CONTENT
+  </section>
+
+  <!-- NOTICES -->
+  <section id="notices" class="section">
+    NOTICES CONTENT
+  </section>
+
 </div>
 
 <script type="module" src="student-dashboard.js"></script>
