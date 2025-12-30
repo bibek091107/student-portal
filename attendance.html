@@ -4,20 +4,77 @@
   <meta charset="UTF-8">
   <title>Attendance</title>
   <link rel="stylesheet" href="student-dashboard.css">
-  <style>
-    /* Attendance-specific styles */
-    .circle-wrapper { position: relative; display: flex; justify-content: center; }
-    .attendance-tooltip { position: absolute; bottom: -55px; background: #111827; color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 13px; opacity: 0; transition: 0.3s ease; pointer-events: none; white-space: nowrap; }
-    .vertical-chart { display: flex; justify-content: space-around; align-items: flex-end; height: 220px; margin-top: 20px; }
-    .v-bar-box { text-align: center; width: 60px; }
-    .v-bar { background: #e5e7eb; height: 180px; border-radius: 10px; display: flex; align-items: flex-end; overflow: hidden; }
-    .v-bar-fill { width: 100%; background: #22c55e; border-radius: 10px 10px 0 0; color: white; font-size: 12px; text-align: center; padding-top: 5px; }
-    .v-label { margin-top: 8px; font-size: 12px; font-weight: bold; }
-    .attendance-top { display: grid; grid-template-columns: 300px 1fr; gap: 30px; align-items: center; }
 
-    .profile-table td, .profile-table th { padding: 10px; }
+  <style>
+    /* ---------- Attendance Hover Tooltip ---------- */
+    .circle-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .attendance-tooltip {
+      position: absolute;
+      bottom: -55px;
+      background: #111827;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      opacity: 0;
+      transition: 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* ---------- Vertical Bar Chart ---------- */
+    .vertical-chart {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 220px;
+      margin-top: 20px;
+    }
+
+    .v-bar-box {
+      text-align: center;
+      width: 60px;
+    }
+
+    .v-bar {
+      background: #e5e7eb;
+      height: 180px;
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+
+    .v-bar-fill {
+      width: 100%;
+      background: #22c55e;
+      border-radius: 10px 10px 0 0;
+      color: white;
+      font-size: 12px;
+      text-align: center;
+      padding-top: 5px;
+    }
+
+    .v-label {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .attendance-top {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+      align-items: center;
+    }
   </style>
 </head>
+
 <body>
 
 <!-- Sidebar -->
@@ -41,7 +98,6 @@
     <h3>Attendance Details</h3>
   </div>
 
-  <!-- ATTENDANCE SECTION -->
   <section class="section">
 
     <!-- TOP SECTION -->
@@ -142,14 +198,15 @@
           <td>30</td>
           <td>90%</td>
         </tr>
-
       </table>
     </div>
 
   </section>
-
 </div>
 
+<!-- JAVASCRIPT -->
+<script src="attendance.js"></script>
 <script src="common.js"></script>
+
 </body>
 </html>
