@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notices</title>
+  <link rel="stylesheet" href="dashboard.css">
+
+  <style>
+    .tag {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: white;
+    }
+    .exam { background: #dc2626; }
+    .academic { background: #2563eb; }
+    .general { background: #16a34a; }
+    .internship { background: #7c3aed; }
+
+    .important {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .view-link {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .view-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Student Portal</h2>
+  <ul>
+    <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
+    <li onclick="location.href='profile.html'">👤 Profile</li>
+    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li onclick="location.href='results.html'">📝 Grade/Mark</li>
+    <li onclick="location.href='courses.html'">📚 Courses</li>
+    <li onclick="location.href='notices.html'">📢 Notices</li>
+    <li id="logoutBtn">🚪 Logout</li>
+  </ul>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="navbar">
+    <h3>Notices & Announcements</h3>
+  </div>
+
+  <section class="section">
+    <div class="wide-card">
+      <table class="profile-table">
+        <tr>
+          <td><strong>Date</strong></td>
+          <td><strong>Notice</strong></td>
+          <td><strong>Category</strong></td>
+          <td><strong>Action</strong></td>
+        </tr>
+
+        <tr>
+          <td>12 Aug 2025</td>
+          <td class="important">Semester Examination Timetable Released</td>
+          <td><span class="tag exam">Exam</span></td>
+          <td><a href="#" class="view-link">View</a></td>
+        </tr>
+
+        <tr>
+          <td>08 Aug 2025</td>
+          <td>Internship Registration Portal Open</td>
+          <td><span class="tag internship">Internship</span></td>
+          <td><a href="#" class="view-link">Apply</a></td>
+        </tr>
+
+        <tr>
+          <td>05 Aug 2025</td>
+          <td>Project Submission Deadline Extended</td>
+          <td><span class="tag academic">Academic</span></td>
+          <td><a href="#" class="view-link">View</a></td>
+        </tr>
+
+        <tr>
+          <td>02 Aug 2025</td>
+          <td>Library Fine Clearance Notice</td>
+          <td><span class="tag general">General</span></td>
+          <td><a href="#" class="view-link">View</a></td>
+        </tr>
+
+      </table>
+    </div>
+  </section>
+</div>
+
+<script src="notice.js"></script>
+<script src="common.js"></script>
+
+</body>
+</html>
