@@ -83,3 +83,22 @@ logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "studentlogin.html";
 });
+
+// Sidebar navigation
+const navItems = document.querySelectorAll(".sidebar li[data-section]");
+const sections = document.querySelectorAll(".section");
+
+navItems.forEach(item => {
+  item.addEventListener("click", () => {
+    // Remove active class
+    navItems.forEach(i => i.classList.remove("active"));
+    sections.forEach(sec => sec.classList.remove("active"));
+
+    // Activate clicked
+    item.classList.add("active");
+    document
+      .getElementById(item.dataset.section)
+      .classList.add("active");
+  });
+});
+
