@@ -11,12 +11,12 @@
 <div class="sidebar">
   <h2>Student Portal</h2>
   <ul>
-    <li data-section="home" class="active">🏠 Home</li>
-    <li data-section="profile">👤 Profile</li>
-    <li data-section="attendance">📊 Attendance</li>
-    <li data-section="grades">📝 Grade/Marks</li>
-    <li data-section="courses">📚 Courses</li>
-    <li data-section="notices">📢 Notices</li>
+    <li onclick="location.href='home.html'">🏠 Home</li>
+    <li onclick="location.href='profile.html'">👤 Profile</li>
+    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
+    <li onclick="location.href='courses.html'">📚 Courses</li>
+    <li onclick="location.href='notices.html'">📢 Notices</li>
     <li id="logoutBtn">🚪 Logout</li>
   </ul>
 </div>
@@ -32,34 +32,51 @@
     </div>
   </div>
 
-  <!-- HOME -->
+  <!-- HOME DASHBOARD -->
   <section id="home" class="section active">
-    <!-- your existing HOME content here -->
-  </section>
 
-  <!-- PROFILE -->
-  <section id="profile" class="section">
-    PROFILE CONTENT
-  </section>
+    <!-- Cards -->
+    <div class="dashboard-cards">
+      <div class="dash-card">
+        <h4>ATTENDANCE</h4>
+        <div class="circle">
+          <span>82%</span>
+        </div>
+      </div>
 
-  <!-- ATTENDANCE -->
-  <section id="attendance" class="section">
-    ATTENDANCE CONTENT
-  </section>
+      <div class="dash-card">
+        <h4>OVERALL PERFORMANCE</h4>
+        <h2 class="good">Good</h2>
+      </div>
 
-  <!-- GRADES -->
-  <section id="grades" class="section">
-    GRADES CONTENT
-  </section>
+      <div class="dash-card">
+        <h4>TOTAL COURSES</h4>
+        <h2 class="blue">6</h2>
+      </div>
+    </div>
 
-  <!-- COURSES -->
-  <section id="courses" class="section">
-    COURSES CONTENT
-  </section>
+    <!-- Profile -->
+    <div class="wide-card">
+      <h3>Student Profile</h3>
+      <table class="profile-table">
+        <tr><td>Student Name</td><td id="profileName">Loading...</td></tr>
+        <tr><td>Student ID</td><td id="profileStudentId">Loading...</td></tr>
+        <tr><td>Register No.</td><td id="profileRegNo">Loading...</td></tr>
+        <tr><td>Email ID</td><td id="profileEmail">Loading...</td></tr>
+        <tr><td>Program</td><td id="profileProgram">Loading...</td></tr>
+      </table>
+    </div>
 
-  <!-- NOTICES -->
-  <section id="notices" class="section">
-    NOTICES CONTENT
+    <!-- Notices -->
+    <div class="wide-card">
+      <h3>RECENT NOTICES</h3>
+      <ul>
+        <li>📌 Mid-term exams start from July 20</li>
+        <li>📌 Project submission deadline extended</li>
+        <li>📌 Attendance below 75% will be penalized</li>
+      </ul>
+    </div>
+
   </section>
 
 </div>
