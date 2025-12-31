@@ -53,50 +53,58 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  emailEl.innerText = user.email;
+  if (emailEl) emailEl.innerText = user.email;
 
-  // Firestore document ID
+  // Firestore document ID (EMAIL BASED)
   const docId = user.email.replace(/[@.]/g, "_");
 
   try {
     const ref = doc(db, "Students", docId);
     const snap = await getDoc(ref);
 
+    // FIRST LOGIN / PROFILE NOT YET CREATED
     if (!snap.exists()) {
-      welcomeEl.innerText = "Welcome";
-      nameEl.innerText = "Profile not found";
-      studentIdEl.innerText = "-";
-      regNoEl.innerText = "-";
-      programEl.innerText = "-";
+      welcomeEl.innerText = "Welcome!";
+      nameEl.innerText = "Profile not created yet";
+      studentIdEl.innerText = "—";
+      regNoEl.innerText = "—";
+      programEl.innerText = "—";
+
+      if (attendanceEl) attendanceEl.innerText = "0%";
+      if (totalCoursesEl) totalCoursesEl.innerText = "0";
+      if (performanceEl) performanceEl.innerText = "N/A";
       return;
     }
 
     const data = snap.data();
 
-    /* ===== PROFILE ===== */
-    welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
-    nameEl.innerText = data["Name"] || "-";
-    studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
-    regNoEl.innerText = data["Reg No."] || "-";
-    programEl.innerText = data["Program/Course"] || "-";
+    /* ===== PROFILE DATA (MATCH FIRESTORE KEYS) ===== */
+    welcomeEl.innerText = `Welcome, ${data.name || "Student"}`;
+    nameEl.innerText = data.name || "-";
+    studentIdEl.innerText = data.studentId || "-";
+    regNoEl.innerText = data.regNo || "-";
+    programEl.innerText = data.program || "-";
 
     /* ===== DASHBOARD FIGURES ===== */
 
     // Attendance %
-    const attendance = data.attendancePercent || 0;
-    attendanceEl.innerText = attendance + "%";
+    const attendance = Number(data.attendancePercent || 0);
+    if (attendanceEl) attendanceEl.innerText = attendance + "%";
 
-    // Courses count
-    const coursesCount = data.courses?.length || 0;
-    totalCoursesEl.innerText = coursesCount;
+    // Total courses
+    const coursesCount = Array.isArray(data.courses)
+      ? data.courses.length
+      : 0;
+    if (totalCoursesEl) totalCoursesEl.innerText = coursesCount;
 
-    // Performance logic
+    // Performance
     let performance = "Average";
     if (attendance >= 85) performance = "Excellent";
     else if (attendance >= 75) performance = "Good";
-    else performance = "Needs Improvement";
+    else if (attendance > 0) performance = "Needs Improvement";
+    else performance = "N/A";
 
-    performanceEl.innerText = performance;
+    if (performanceEl) performanceEl.innerText = performance;
 
   } catch (err) {
     console.error("Dashboard error:", err);
@@ -107,7 +115,9 @@ onAuthStateChanged(auth, async (user) => {
 /* ===============================
    LOGOUT
 ================================ */
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "studentlogin.html";
-});
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "studentlogin.html";
+  });
+}
