@@ -92,36 +92,32 @@ onAuthStateChanged(auth, async (user) => {
     regNoEl.innerText = data.regNo || "-";
     programEl.innerText = data.program || "-";
 
-// 5️⃣ Nav profile image
+    // 5️⃣ Nav profile image (use existing <img id="navProfileImg">)
+    const navImg = document.getElementById("navProfileImg");
+
     if (data.photoUrl) {
-      const img = document.createElement("img");
-      // Ensure the Google Drive link is in "uc?export=view&id=" format
-      img.src = data.photoUrl.includes("drive.google.com") && !data.photoUrl.includes("uc?export=view")
-        ? data.photoUrl.replace("/open?id=", "/uc?export=view&id=")
-        : data.photoUrl;
-  img.alt = "Profile";
-      img.style.width = "50px";
-      img.style.height = "50px";
-      img.style.borderRadius = "50%";
-      img.style.objectFit = "cover";
-      // Replace the emoji with the image
-      navProfileContainer.innerHTML = "";
-      navProfileContainer.appendChild(img);
+      // Ensure Google Drive link is in direct access format
+      let photoLink = data.photoUrl;
+
+      if (photoLink.includes("drive.google.com")) {
+        // Convert standard drive link to direct link
+        if (photoLink.includes("/file/d/")) {
+          const id = photoLink.match(/\/file\/d\/(.*?)\//)[1];
+          photoLink = `https://drive.google.com/uc?export=view&id=${id}`;
+        } else if (photoLink.includes("id=")) {
+          const id = photoLink.split("id=")[1];
+          photoLink = `https://drive.google.com/uc?export=view&id=${id}`;
+        }
+      }
+
+      navImg.src = photoLink;
     } else {
-      // Fallback if no photo
-      navProfileContainer.innerText = "👤";
+      // fallback image
+      navImg.src = "default-avatar.png"; // you can create a default avatar image
     }
+
   } catch (err) {
     console.error("Dashboard error:", err);
     nameEl.innerText = "Error loading data";
   }
-});
-
-
-/* ===============================
-   LOGOUT
-================================ */
-logoutBtn.addEventListener("click", async () => {
-  await signOut(auth);
-  window.location.href = "studentlogin.html";
 });
