@@ -92,18 +92,30 @@ onAuthStateChanged(auth, async (user) => {
     regNoEl.innerText = data.regNo || "-";
     programEl.innerText = data.program || "-";
 
-    // 5️⃣ Nav profile image
-navProfileContainer.innerHTML = "";  // clear any old content
-if (data.photoUrl) {
-  const img = document.createElement("img");
-  img.src = data.photoUrl.includes("drive.google.com") && !data.photoUrl.includes("uc?export=view")
-    ? data.photoUrl.replace("/open?id=", "/uc?export=view&id=")
-    : data.photoUrl;
+// 5️⃣ Nav profile image
+    if (data.photoUrl) {
+      const img = document.createElement("img");
+      // Ensure the Google Drive link is in "uc?export=view&id=" format
+      img.src = data.photoUrl.includes("drive.google.com") && !data.photoUrl.includes("uc?export=view")
+        ? data.photoUrl.replace("/open?id=", "/uc?export=view&id=")
+        : data.photoUrl;
   img.alt = "Profile";
-  navProfileContainer.appendChild(img);
-} else {
-  navProfileContainer.innerText = "👤";  // fallback
-}
+      img.style.width = "50px";
+      img.style.height = "50px";
+      img.style.borderRadius = "50%";
+      img.style.objectFit = "cover";
+      // Replace the emoji with the image
+      navProfileContainer.innerHTML = "";
+      navProfileContainer.appendChild(img);
+    } else {
+      // Fallback if no photo
+      navProfileContainer.innerText = "👤";
+    }
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    nameEl.innerText = "Error loading data";
+  }
+});
 
 
 /* ===============================
