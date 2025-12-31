@@ -1,79 +1,130 @@
-/************ FIREBASE CONFIG ************/
-const PROJECT_ID = "student-management-syste-e3edc";
-const COLLECTION = "Students";
-/***************************************/
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-document.addEventListener("DOMContentLoaded", loadProfile);
+/* ===============================
+   FIREBASE CONFIG (UNCHANGED)
+================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
+  authDomain: "student-management-syste-e3edc.firebaseapp.com",
+  projectId: "student-management-syste-e3edc",
+  storageBucket: "student-management-syste-e3edc.appspot.com",
+  messagingSenderId: "674803364755",
+  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
+};
 
-async function loadProfile() {
-  const email = localStorage.getItem("userEmail");
-  if (!email) return;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-  const docId = email.replace(/[@.]/g, "_");
+/* ===============================
+   HELPERS
+================================ */
+const setText = (id, value) => {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value || "-";
+};
 
-  const url =
-    `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}` +
-    `/databases/(default)/documents/${COLLECTION}/${docId}`;
+const setImage = (id, url) => {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-  const res = await fetch(url);
-  const json = await res.json();
-
-  if (!json.fields) return;
-
-  const f = json.fields;
-
-  // PERSONAL INFO
-  setText(0, f.name);
-  setText(1, f.dob);
-  setText(2, f.gender);
-  setText(3, f.email);
-  setText(4, f.phone);
-  setText(5, f.address);
-
-  // ACADEMIC
-  setAcademic(2, f.program);
-  setAcademic(3, f.batchYear);
-  setAcademic(4, f.semester);
-  setAcademic(5, f.section);
-  setAcademic(6, f.regNo);
-  setAcademic(7, f.studentId);
-  setAcademic(8, f.modeOfStudy);
-
-  // PARENTS
-  setParent(0, f.fatherName);
-  setParent(1, f.fatherPhone);
-  setParent(2, f.motherName);
-  setParent(3, f.motherPhone);
-  setParent(4, f.guardian);
-
-  // PHOTO
-  const img = document.querySelector(".profile-pic-card img");
-  if (img && f.photoUrl?.stringValue) {
-    img.src = f.photoUrl.stringValue;
+  if (url) {
+    let link = url;
+    if (link.includes("drive.google.com")) {
+      const match = link.match(/[-\w]{25,}/);
+      if (match) {
+        link = `https://drive.google.com/uc?export=view&id=${match[0]}`;
+      }
+    }
+    el.src = link;
+  } else {
+    el.src = "default-avatar.png";
   }
-}
+};
 
-/* ========= HELPERS ========= */
-function setText(rowIndex, field) {
-  const cell = document.querySelectorAll(".profile-top .profile-table tr")[rowIndex]
-    ?.children[1];
-  if (cell) cell.innerText = field?.stringValue || "—";
-}
+/* ===============================
+   AUTH + LOAD PROFILE DATA
+================================ */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "studentlogin.html";
+    return;
+  }
 
-function setAcademic(rowIndex, field) {
-  const rows = document.querySelectorAll(".wide-card:nth-of-type(2) .profile-table tr");
-  if (rows[rowIndex]) rows[rowIndex].children[1].innerText = field?.stringValue || "—";
-}
+  let data = null;
 
-function setParent(rowIndex, field) {
-  const rows = document.querySelectorAll(".wide-card:nth-of-type(3) .profile-table tr");
-  if (rows[rowIndex]) rows[rowIndex].children[1].innerText = field?.stringValue || "—";
-}
+  try {
+    // 1️⃣ Try email-based document ID
+    const docId = user.email.replace(/[@.]/g, "_");
+    const ref = doc(db, "Students", docId);
+    const snap = await getDoc(ref);
 
-/* PREVENT BROKEN IMAGE */
-const profileImg = document.querySelector(".profile-pic-card img");
-if (profileImg) {
-  profileImg.onerror = () => {
-    profileImg.src = "https://via.placeholder.com/200";
-  };
-}
+    if (snap.exists()) {
+      data = snap.data();
+    } else {
+      // 2️⃣ Fallback: query by email field
+      const q = query(
+        collection(db, "Students"),
+        where("email", "==", user.email)
+      );
+      const qs = await getDocs(q);
+      if (!qs.empty) data = qs.docs[0].data();
+    }
+
+    if (!data) return;
+
+    /* ===============================
+       PERSONAL INFORMATION
+    ================================ */
+    setText("name", data.name);
+    setText("cardName", data.name);
+    setText("dob", data.dob);
+    setText("gender", data.gender);
+    setText("email", data.email);
+    setText("phone", data.phone);
+    setText("address", data.address);
+
+    /* ===============================
+       ACADEMIC DETAILS
+    ================================ */
+    setText("program", data.program);
+    setText("program2", data.program);
+    setText("batchYear", data.batchYear);
+    setText("semester", data.semester);
+    setText("section", data.section);
+    setText("regNo", data.regNo);
+    setText("studentId", data.studentId);
+    setText("modeOfStudy", data.modeOfStudy);
+
+    /* ===============================
+       PARENTS / GUARDIAN
+    ================================ */
+    setText("fatherName", data.fatherName);
+    setText("fatherPhone", data.fatherPhone);
+    setText("motherName", data.motherName);
+    setText("motherPhone", data.motherPhone);
+    setText("guardian", data.guardian);
+
+    /* ===============================
+       PROFILE PHOTOS
+    ================================ */
+    setImage("profilePhoto", data.photoUrl);
+    setImage("navPhoto", data.photoUrl);
+
+  } catch (err) {
+    console.error("Profile load error:", err);
+  }
+});
