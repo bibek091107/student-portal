@@ -1,130 +1,62 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
-/* ===============================
-   FIREBASE CONFIG (UNCHANGED)
-================================ */
-const firebaseConfig = {
-  apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
-  authDomain: "student-management-syste-e3edc.firebaseapp.com",
-  projectId: "student-management-syste-e3edc",
-  storageBucket: "student-management-syste-e3edc.appspot.com",
-  messagingSenderId: "674803364755",
-  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* ===============================
-   HELPERS
-================================ */
-const setText = (id, value) => {
-  const el = document.getElementById(id);
-  if (el) el.innerText = value || "-";
-};
-
-const setImage = (id, url) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-
-  if (url) {
-    let link = url;
-    if (link.includes("drive.google.com")) {
-      const match = link.match(/[-\w]{25,}/);
-      if (match) {
-        link = `https://drive.google.com/uc?export=view&id=${match[0]}`;
-      }
-    }
-    el.src = link;
-  } else {
-    el.src = "default-avatar.png";
-  }
-};
-
-/* ===============================
-   AUTH + LOAD PROFILE DATA
-================================ */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "studentlogin.html";
+    window.location.href = "login.html";
     return;
   }
 
-  let data = null;
-
   try {
-    // 1️⃣ Try email-based document ID
-    const docId = user.email.replace(/[@.]/g, "_");
-    const ref = doc(db, "Students", docId);
-    const snap = await getDoc(ref);
+    // 🔥 Correct document reference
+    const docRef = doc(db, "Students", user.uid);
+    const snap = await getDoc(docRef);
 
-    if (snap.exists()) {
-      data = snap.data();
-    } else {
-      // 2️⃣ Fallback: query by email field
-      const q = query(
-        collection(db, "Students"),
-        where("email", "==", user.email)
-      );
-      const qs = await getDocs(q);
-      if (!qs.empty) data = qs.docs[0].data();
+    if (!snap.exists()) {
+      console.error("Student document not found");
+      return;
     }
 
-    if (!data) return;
+    const data = snap.data();
 
-    /* ===============================
-       PERSONAL INFORMATION
-    ================================ */
+    // 🔹 Helper function (prevents errors)
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = value || "-";
+    };
+
+    // 🔹 BASIC INFO
     setText("name", data.name);
-    setText("cardName", data.name);
-    setText("dob", data.dob);
-    setText("gender", data.gender);
     setText("email", data.email);
     setText("phone", data.phone);
+    setText("gender", data.gender);
+    setText("dob", data.dob);
     setText("address", data.address);
 
-    /* ===============================
-       ACADEMIC DETAILS
-    ================================ */
+    // 🔹 ACADEMIC INFO
+    setText("studentId", data.studentId);
+    setText("regNo", data.regNo);
     setText("program", data.program);
-    setText("program2", data.program);
-    setText("batchYear", data.batchYear);
     setText("semester", data.semester);
     setText("section", data.section);
-    setText("regNo", data.regNo);
-    setText("studentId", data.studentId);
+    setText("batchYear", data.batchYear);
     setText("modeOfStudy", data.modeOfStudy);
 
-    /* ===============================
-       PARENTS / GUARDIAN
-    ================================ */
+    // 🔹 PARENTS INFO
     setText("fatherName", data.fatherName);
     setText("fatherPhone", data.fatherPhone);
     setText("motherName", data.motherName);
     setText("motherPhone", data.motherPhone);
     setText("guardian", data.guardian);
 
-    /* ===============================
-       PROFILE PHOTOS
-    ================================ */
-    setImage("profilePhoto", data.photoUrl);
-    setImage("navPhoto", data.photoUrl);
+    // 🔹 PROFILE PHOTO
+    const img = document.getElementById("profilePhoto");
+    if (img && data.photoUrl) {
+      img.src = data.photoUrl;
+    }
 
   } catch (err) {
-    console.error("Profile load error:", err);
+    console.error("Error loading profile:", err);
   }
 });
