@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Results</title>
-  <link rel="stylesheet" href="student-dashboard.css">
+  <link rel="stylesheet" href="result.css">
 
   <style>
     .results-grid {
@@ -19,6 +19,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <!-- Sidebar -->
@@ -28,7 +29,7 @@
     <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
     <li onclick="location.href='profile.html'">👤 Profile</li>
     <li onclick="location.href='attendance.html'">📊 Attendance</li>
-    <li onclick="location.href='results.html'">📝 Grade/Marks</li>
+    <li class="active">📝 Grade/Marks</li>
     <li onclick="location.href='courses.html'">📚 Courses</li>
     <li onclick="location.href='notices.html'">📢 Notices</li>
     <li id="logoutBtn">🚪 Logout</li>
@@ -43,93 +44,73 @@
     <h3>Results Overview</h3>
   </div>
 
+  <!-- RESULTS SECTION -->
   <section class="section">
 
-    <!-- PRACTICAL + CLA -->
     <div class="results-grid">
 
-      <!-- Practical Marks -->
+      <!-- Practical -->
       <div class="wide-card">
         <h3>Practical Examination Marks</h3>
         <table class="profile-table">
-          <tr>
-            <td><strong>Subject</strong></td>
-            <td><strong>Marks</strong></td>
-            <td><strong>Grade</strong></td>
-          </tr>
+          <tr><td><strong>Subject</strong></td><td><strong>Marks</strong></td><td><strong>Grade</strong></td></tr>
           <tr><td>DS Lab</td><td>92 / 100</td><td>A+</td></tr>
           <tr><td>OS Lab</td><td>88 / 100</td><td>A</td></tr>
           <tr><td>Python Lab</td><td>95 / 100</td><td>A+</td></tr>
         </table>
       </div>
 
-    <!-- Weekly Test / CLA -->
+      <!-- CLA -->
       <div class="wide-card">
         <h3>Weekly Tests / CLA</h3>
         <table class="profile-table">
-          <tr>
-            <td><strong>Assessment</strong></td>
-            <td><strong>Score</strong></td>
-          </tr>
+          <tr><td><strong>Assessment</strong></td><td><strong>Score</strong></td></tr>
           <tr><td>CLA – 1</td><td>18 / 20</td></tr>
           <tr><td>CLA – 2</td><td>17 / 20</td></tr>
           <tr><td>CLA – 3</td><td>19 / 20</td></tr>
-          <tr><td><strong>Average</strong></td><td><strong>90%</strong></td></tr>
+          <tr><td><strong>Average</strong></td><td><strong id="claAvg">90%</strong></td></tr>
         </table>
       </div>
 
-    <!-- THEORY RESULTS -->
-    <div class="wide-card">
-      <h3>Written Examination</h3>
-      <table class="profile-table">
-        <tr>
-          <td><strong>Subject</strong></td>
-          <td><strong>Marks</strong></td>
-          <td><strong>Grade</strong></td>
-        </tr>
-        <tr><td>Data Structures</td><td>86 / 100</td><td>A</td></tr>
-        <tr><td>Operating Systems</td><td>79 / 100</td><td>B+</td></tr>
-        <tr><td>Mathematics</td><td>88 / 100</td><td>A</td></tr>
-      </table>
-    </div>
+      <!-- Theory -->
+      <div class="wide-card">
+        <h3>Written Examination</h3>
+        <table class="profile-table">
+          <tr><td><strong>Subject</strong></td><td><strong>Marks</strong></td><td><strong>Grade</strong></td></tr>
+          <tr><td>Data Structures</td><td>86 / 100</td><td>A</td></tr>
+          <tr><td>Operating Systems</td><td>79 / 100</td><td>B+</td></tr>
+          <tr><td>Mathematics</td><td>88 / 100</td><td>A</td></tr>
+        </table>
+      </div>
 
-    <!-- TOTAL MARKS -->
-    <div class="wide-card">
-      <h3>Total Marks Summary</h3>
-      <table class="profile-table">
-        <tr><td>Total Subjects</td><td>3</td></tr>
-        <tr><td>Total Marks Obtained</td><td>253</td></tr>
-        <tr><td>Total Maximum Marks</td><td>300</td></tr>
-        <tr><td>Overall Percentage</td><td><strong>84.33%</strong></td></tr>
-      </table>
-    </div>
+      <!-- Summary -->
+      <div class="wide-card">
+        <h3>Total Marks Summary</h3>
+        <table class="profile-table">
+          <tr><td>Total Subjects</td><td>3</td></tr>
+          <tr><td>Total Marks Obtained</td><td>253</td></tr>
+          <tr><td>Total Maximum Marks</td><td>300</td></tr>
+          <tr>
+            <td>Overall Percentage</td>
+            <td><strong id="overallPercent">84.33%</strong></td>
+          </tr>
+        </table>
+      </div>
 
-    <!-- CGPA -->
-    <div class="wide-card">
-      <h3>CGPA</h3>
-      <table class="profile-table">
-        <tr>
-          <td><strong>Semester</strong></td>
-          <td><strong>CGPA</strong></td>
-        </tr>
-        <tr>
-          <td>Semester 1</td>
-          <td><strong>8.6</strong></td>
-        </tr>
-      </table>
-    </div>
-
-    
-
-    
+      <!-- CGPA -->
+      <div class="wide-card">
+        <h3>CGPA</h3>
+        <table class="profile-table">
+          <tr><td><strong>Semester</strong></td><td><strong>CGPA</strong></td></tr>
+          <tr><td>Semester 1</td><td><strong>8.6</strong></td></tr>
+        </table>
+      </div>
 
     </div>
-
   </section>
 </div>
 
 <script src="common.js"></script>
 <script src="results.js"></script>
-
 </body>
 </html>
