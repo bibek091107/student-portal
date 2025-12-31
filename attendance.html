@@ -4,75 +4,6 @@
   <meta charset="UTF-8">
   <title>Attendance</title>
   <link rel="stylesheet" href="attendance.css">
-
-  <style>
-    /* ---------- Attendance Hover Tooltip ---------- */
-    .circle-wrapper {
-      position: relative;
-      display: flex;
-      justify-content: center;
-    }
-
-    .attendance-tooltip {
-      position: absolute;
-      bottom: -55px;
-      background: #111827;
-      color: #fff;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      opacity: 0;
-      transition: 0.3s ease;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-
-    /* ---------- Vertical Bar Chart ---------- */
-    .vertical-chart {
-      display: flex;
-      justify-content: space-around;
-      align-items: flex-end;
-      height: 220px;
-      margin-top: 20px;
-    }
-
-    .v-bar-box {
-      text-align: center;
-      width: 60px;
-    }
-
-    .v-bar {
-      background: #e5e7eb;
-      height: 180px;
-      border-radius: 10px;
-      display: flex;
-      align-items: flex-end;
-      overflow: hidden;
-    }
-
-    .v-bar-fill {
-      width: 100%;
-      background: #22c55e;
-      border-radius: 10px 10px 0 0;
-      color: white;
-      font-size: 12px;
-      text-align: center;
-      padding-top: 5px;
-    }
-
-    .v-label {
-      margin-top: 8px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
-    .attendance-top {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 30px;
-      align-items: center;
-    }
-  </style>
 </head>
 
 <body>
@@ -83,7 +14,7 @@
   <ul>
     <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
     <li onclick="location.href='profile.html'">👤 Profile</li>
-    <li onclick="location.href='attendance.html'">📊 Attendance</li>
+    <li class="active" onclick="location.href='attendance.html'">📊 Attendance</li>
     <li onclick="location.href='results.html'">📝 Grade/Marks</li>
     <li onclick="location.href='courses.html'">📚 Courses</li>
     <li onclick="location.href='notices.html'">📢 Notices</li>
@@ -98,7 +29,8 @@
     <h3>Attendance Details</h3>
   </div>
 
-  <section class="section">
+  <!-- Attendance Section -->
+  <section class="section active">
 
     <!-- TOP SECTION -->
     <div class="wide-card attendance-top">
@@ -109,7 +41,7 @@
 
         <div class="circle-wrapper">
           <div class="circle" id="attendanceCircle">
-            <span id="attendancePercent">82%</span>
+            <span id="attendancePercent">0%</span>
           </div>
 
           <div class="attendance-tooltip" id="attendanceTooltip">
@@ -204,9 +136,8 @@
   </section>
 </div>
 
-<!-- JAVASCRIPT -->
+<!-- JS -->
 <script src="attendance.js"></script>
-<script src="common.js"></script>
-
+  <script src="common.js"></script>
 </body>
 </html>
