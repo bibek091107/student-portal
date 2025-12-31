@@ -1,4 +1,3 @@
-// student-dashboard.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -41,12 +40,8 @@ const emailEl = document.getElementById("profileEmail");
 const studentIdEl = document.getElementById("profileStudentId");
 const regNoEl = document.getElementById("profileRegNo");
 const programEl = document.getElementById("profileProgram");
-
-const attendanceEl = document.getElementById("attendancePercent");
-const totalCoursesEl = document.getElementById("totalCourses");
-const performanceEl = document.getElementById("overallPerformance");
-
 const logoutBtn = document.getElementById("logoutBtn");
+const navProfileContainer = document.querySelector(".nav-profile");
 
 /* ===============================
    AUTH + LOAD DATA
@@ -61,70 +56,55 @@ onAuthStateChanged(auth, async (user) => {
   let data = null;
 
   try {
-    /* ===============================
-       1️⃣ TRY OLD METHOD (email as doc ID)
-    ================================ */
+    // 1️⃣ Try old method (email as doc ID)
     const emailDocId = user.email.replace(/[@.]/g, "_");
     const emailDocRef = doc(db, "Students", emailDocId);
     const emailSnap = await getDoc(emailDocRef);
 
     if (emailSnap.exists()) {
       data = emailSnap.data();
-    } 
-    else {
-      /* ===============================
-         2️⃣ TRY NEW METHOD (query by Email field)
-      ================================ */
+    } else {
+      // 2️⃣ Try new method (query by Email field)
       const q = query(
         collection(db, "Students"),
-        where("Email", "==", user.email)
+        where("email", "==", user.email)
       );
-
       const querySnap = await getDocs(q);
-
       if (!querySnap.empty) {
         data = querySnap.docs[0].data();
       }
     }
 
-    /* ===============================
-       NO RECORD FOUND
-    ================================ */
+    // 3️⃣ No record found
     if (!data) {
       welcomeEl.innerText = "Welcome";
       nameEl.innerText = "Student record not found";
       studentIdEl.innerText = "-";
       regNoEl.innerText = "-";
       programEl.innerText = "-";
-      attendanceEl.innerText = "0%";
-      totalCoursesEl.innerText = "0";
-      performanceEl.innerText = "-";
       return;
     }
 
-    /* ===============================
-       PROFILE DATA (UPPERCASE FIELDS)
-    ================================ */
-    welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
-    nameEl.innerText = data["Name"] || "-";
-    studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
-    regNoEl.innerText = data["Reg No."] || "-";
-    programEl.innerText = data["Program/Course"] || "-";
+    // 4️⃣ Profile Data
+    welcomeEl.innerText = `Welcome, ${data.name || "Student"}`;
+    nameEl.innerText = data.name || "-";
+    studentIdEl.innerText = data.studentId || "-";
+    regNoEl.innerText = data.regNo || "-";
+    programEl.innerText = data.program || "-";
 
-    /* ===============================
-       DASHBOARD STATS
-    ================================ */
-    const attendance = data["Attendance"] || 0;
-    attendanceEl.innerText = attendance + "%";
-
-    const coursesCount = data["Courses"]?.length || 0;
-    totalCoursesEl.innerText = coursesCount;
-
-    let performance = "Needs Improvement";
-    if (attendance >= 85) performance = "Excellent";
-    else if (attendance >= 75) performance = "Good";
-
-    performanceEl.innerText = performance;
+    // 5️⃣ Nav profile image
+    if (data.photoUrl) {
+      const img = document.createElement("img");
+      img.src = data.photoUrl;
+      img.alt = "Profile";
+      img.style.width = "50px";
+      img.style.height = "50px";
+      img.style.borderRadius = "50%";
+      img.style.objectFit = "cover";
+      // Replace emoji with image
+      navProfileContainer.innerHTML = "";
+      navProfileContainer.appendChild(img);
+    }
 
   } catch (err) {
     console.error("Dashboard error:", err);
