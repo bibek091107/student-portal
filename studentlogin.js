@@ -1,4 +1,3 @@
-/// studentlogin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -46,7 +45,7 @@ const confirmPasswordInput = document.getElementById("confirmPassword");
 let currentStudentDocId = "";
 let currentUserEmail = "";
 
-/* ---------------- LOGIN ---------------- */
+/* ================= LOGIN ================= */
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -56,7 +55,7 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // Login with phone
+    // ---- LOGIN WITH PHONE ----
     if (/^\d+$/.test(identifier)) {
       const phoneSnap = await getDocs(
         query(collection(db, "Students"), where("phone", "==", identifier))
@@ -68,29 +67,22 @@ loginForm.addEventListener("submit", async (e) => {
       }
 
       const data = phoneSnap.docs[0].data();
-      email = data.Email || data.EMAIL;
+      email = data.email; // ✅ lowercase
     }
 
     email = email.toLowerCase();
     currentUserEmail = email;
 
-    // Firebase Auth
+    // ---- FIREBASE AUTH ----
     await signInWithEmailAndPassword(auth, email, password);
 
-    // Try Email
-    let studentSnap = await getDocs(
-      query(collection(db, "Students"), where("Email", "==", email))
+    // ---- GET STUDENT RECORD ----
+    const studentSnap = await getDocs(
+      query(collection(db, "Students"), where("email", "==", email))
     );
 
-    // Try EMAIL (new form)
     if (studentSnap.empty) {
-      studentSnap = await getDocs(
-        query(collection(db, "Students"), where("EMAIL", "==", email))
-      );
-    }
-
-    if (studentSnap.empty) {
-      alert("Student record exists but field mismatch");
+      alert("Student record not found in database");
       return;
     }
 
@@ -98,9 +90,9 @@ loginForm.addEventListener("submit", async (e) => {
     const studentData = studentDoc.data();
     currentStudentDocId = studentDoc.id;
 
+    // ---- FIRST LOGIN CHECK ----
     const isFirstLogin =
       studentData.firstLogin === true ||
-      studentData.FirstLogin === true ||
       studentData.firstLogin === undefined;
 
     if (isFirstLogin) {
@@ -116,7 +108,7 @@ loginForm.addEventListener("submit", async (e) => {
   }
 });
 
-/* ---------------- CHANGE PASSWORD ---------------- */
+/* ================= CHANGE PASSWORD ================= */
 changePasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
