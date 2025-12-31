@@ -116,6 +116,20 @@ onAuthStateChanged(auth, async (user) => {
       navImg.src = "default-avatar.png"; // you can create a default avatar image
     }
 
+      /* ===============================
+   LOGOUT FUNCTIONALITY
+================================ */
+logoutBtn?.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+    // Redirect to login page after logout
+    window.location.href = "studentlogin.html";
+  } catch (err) {
+    console.error("Logout error:", err);
+  }
+});
+
+
   } catch (err) {
     console.error("Dashboard error:", err);
     nameEl.innerText = "Error loading data";
