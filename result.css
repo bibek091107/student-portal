@@ -1,0 +1,47 @@
+/* ===== GLOBAL ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef2f7;
+}
+
+/* IMPORTANT FIX */
+.section {
+  display: block;   /* 🔥 WAS HIDING EVERYTHING */
+  padding: 20px;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  background: #1e3a8a;
+  color: white;
+  height: 100vh;
+  position: fixed;
+}
+
+.sidebar li.active {
+  background: #2563eb;
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background: white;
+  padding: 12px 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+
+#logoutBtn:hover {
+  background: #b91c1c;
+}
