@@ -1,4 +1,3 @@
-/* ===== GLOBAL ===== */
 * {
   box-sizing: border-box;
 }
@@ -7,23 +6,9 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background: #eef2f7;
-  overflow-x: hidden; /* 🔒 prevent horizontal scroll */
 }
 
 /* ===== SIDEBAR ===== */
-.section {
-  display: none;
-}
-
-.section.active {
-  display: block;
-}
-
-.sidebar li.active {
-  background: #2563eb;
-  color: white;
-}
-
 .sidebar {
   width: 240px;
   background: #1e3a8a;
@@ -53,15 +38,17 @@ body {
   transition: background 0.2s ease;
 }
 
-.sidebar li:hover {
-  background: #1d4ed8;
+.sidebar li:hover,
+.sidebar li.active {
+  background: #2563eb;
 }
 
-/* ===== MAIN CONTENT ===== */
+/* ===== MAIN ===== */
 .main {
-  margin-left: 240px;               /* same as sidebar width */
-  width: calc(100vw - 240px);       /* prevent overflow */
+  margin-left: 240px;
+  width: calc(100vw - 240px);
   min-height: 100vh;
+  padding: 20px;
 }
 
 /* ===== NAVBAR ===== */
@@ -72,53 +59,38 @@ body {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-logoutBtn {
-  margin-top: 20px;
-  background: #dc2626;
-}
-
-logoutBtn:hover {
-  background: #b91c1c;
-}
-
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.nav-profile {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
 }
 
 /* ===== SECTIONS ===== */
 .section {
-  padding: 20px;
+  display: none;
 }
 
-/* ===== DASHBOARD CARDS ===== */
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+.section.active {
+  display: block;
 }
 
-.dash-card {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+/* ===== ATTENDANCE ===== */
+.circle-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
-/* ===== ATTENDANCE CIRCLE ===== */
+.attendance-tooltip {
+  position: absolute;
+  bottom: -55px;
+  background: #111827;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  opacity: 0;
+  transition: 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .circle {
   width: 120px;
   height: 120px;
@@ -148,7 +120,6 @@ logoutBtn:hover {
   font-size: 18px;
 }
 
-/* ===== LEGEND ===== */
 .legend {
   text-align: center;
 }
@@ -164,12 +135,6 @@ logoutBtn:hover {
 .green { background: #22c55e; }
 .red { background: #ef4444; }
 
-.good,
-.blue {
-  color: #2563eb;
-}
-
-/* ===== WIDE CARDS ===== */
 .wide-card {
   background: white;
   margin-top: 25px;
@@ -178,7 +143,6 @@ logoutBtn:hover {
   box-shadow: 0 2px 10px rgba(0,0,0,0.08);
 }
 
-/* ===== PROFILE TABLE ===== */
 .profile-table {
   width: 100%;
   border-collapse: collapse;
@@ -194,7 +158,47 @@ logoutBtn:hover {
   width: 200px;
 }
 
-/* ===== HIDDEN SECTIONS ===== */
-.hidden {
-  display: none;
+.vertical-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 220px;
+  margin-top: 20px;
+}
+
+.v-bar-box {
+  text-align: center;
+  width: 60px;
+}
+
+.v-bar {
+  background: #e5e7eb;
+  height: 180px;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.v-bar-fill {
+  width: 100%;
+  background: #22c55e;
+  border-radius: 10px 10px 0 0;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.v-label {
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.attendance-top {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  align-items: center;
 }
