@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="profile.css">
 
   <style>
-    /* Profile top layout */
     .profile-top {
       display: grid;
       grid-template-columns: 1fr 220px;
@@ -29,24 +28,14 @@
       object-fit: cover;
       margin-bottom: 10px;
     }
-
-    .profile-pic-card h4 {
-      margin: 5px 0;
-    }
-
-    .profile-pic-card p {
-      font-size: 14px;
-      color: #555;
-    }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <h2>Student Portal</h2>
   <ul>
-    <li onclick="location.href='home.html'">🏠 Home</li>
+    <li onclick="location.href='student-dashboard.html'">🏠 Home</li>
     <li onclick="location.href='profile.html'">👤 Profile</li>
     <li onclick="location.href='attendance.html'">📊 Attendance</li>
     <li onclick="location.href='results.html'">📝 Grade/Marks</li>
@@ -56,76 +45,63 @@
   </ul>
 </div>
 
-<!-- Main -->
 <div class="main">
-
-  <!-- Navbar -->
   <div class="navbar">
     <h3>My Profile</h3>
-    <img src="https://i.pravatar.cc/70" class="nav-profile">
+    <img id="navPhoto" class="nav-profile">
   </div>
 
   <section class="section">
 
-    <!-- TOP: Personal info + photo -->
     <div class="profile-top">
 
-      <!-- Personal Information -->
       <div class="wide-card">
         <h3>Personal Information</h3>
         <table class="profile-table">
-          <tr><td>Full Name</td><td>XXXXXXXXXX</td></tr>
-          <tr><td>Date of Birth</td><td>-- / -- / ----</td></tr>
-          <tr><td>Gender</td><td>Male</td></tr>
-          <tr><td>Email</td><td>ec4941@srmist.edu.in</td></tr>
-          <tr><td>Phone</td><td>+91 XXXXXXXXXX</td></tr>
-          <tr><td>Address</td><td>India</td></tr>
+          <tr><td>Full Name</td><td id="name"></td></tr>
+          <tr><td>Date of Birth</td><td id="dob"></td></tr>
+          <tr><td>Gender</td><td id="gender"></td></tr>
+          <tr><td>Email</td><td id="email"></td></tr>
+          <tr><td>Phone</td><td id="phone"></td></tr>
+          <tr><td>Address</td><td id="address"></td></tr>
         </table>
       </div>
 
-      <!-- Profile Picture -->
       <div class="profile-pic-card">
-        <img src="https://i.pravatar.cc/300" alt="Profile Picture">
-        <h4>Eklavya Chaudhary</h4>
-        <p>B.Tech CSE</p>
-        <p>SRMIST – Trichy</p>
+        <img id="profilePhoto">
+        <h4 id="cardName"></h4>
+        <p id="program"></p>
       </div>
-
     </div>
 
-<!-- Academic Details -->
     <div class="wide-card">
       <h3>Academic Details</h3>
       <table class="profile-table">
-        <tr><td>Institution</td><td>SRM Institute of Science and Technology</td></tr>
-        <tr><td>Campus</td><td>Tiruchirappalli</td></tr>
-        <tr><td>Program</td><td>B.Tech Computer Science and Engineering</td></tr>
-        <tr><td>Batch</td><td>2024 – 2028</td></tr>
-        <tr><td>Semester</td><td>2</td></tr>
-        <tr><td>Section</td><td>A</td></tr>
-        <tr><td>Register Number</td><td>RA2511003050529</td></tr>
-        <tr><td>Student ID</td><td>720466</td></tr>
-        <tr><td>Mode of Study</td><td>Regular</td></tr>
+        <tr><td>Program</td><td id="program2"></td></tr>
+        <tr><td>Batch</td><td id="batchYear"></td></tr>
+        <tr><td>Semester</td><td id="semester"></td></tr>
+        <tr><td>Section</td><td id="section"></td></tr>
+        <tr><td>Register Number</td><td id="regNo"></td></tr>
+        <tr><td>Student ID</td><td id="studentId"></td></tr>
+        <tr><td>Mode of Study</td><td id="modeOfStudy"></td></tr>
       </table>
     </div>
-    
-    <!-- Parents Details -->
+
     <div class="wide-card">
       <h3>Parents / Guardian Details</h3>
       <table class="profile-table">
-        <tr><td>Father's Name</td><td>Mr. __________</td></tr>
-        <tr><td>Father's Phone</td><td>+91 XXXXXXXXXX</td></tr>
-        <tr><td>Mother's Name</td><td>Mrs. __________</td></tr>
-        <tr><td>Mother's Phone</td><td>+91 XXXXXXXXXX</td></tr>
-        <tr><td>Guardian (if any)</td><td>—</td></tr>
+        <tr><td>Father's Name</td><td id="fatherName"></td></tr>
+        <tr><td>Father's Phone</td><td id="fatherPhone"></td></tr>
+        <tr><td>Mother's Name</td><td id="motherName"></td></tr>
+        <tr><td>Mother's Phone</td><td id="motherPhone"></td></tr>
+        <tr><td>Guardian</td><td id="guardian"></td></tr>
       </table>
     </div>
 
   </section>
 </div>
 
-<script src="profile.js"></script>
 <script src="common.js"></script>
-
+<script src="profile.js"></script>
 </body>
 </html>
