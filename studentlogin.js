@@ -1,10 +1,20 @@
 /// studentlogin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getAuth, signInWithEmailAndPassword, updatePassword, setPersistence, browserLocalPersistence 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  updatePassword,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { 
-  getFirestore, collection, query, where, getDocs, doc, updateDoc 
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase config
@@ -17,15 +27,13 @@ const firebaseConfig = {
   appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Ensure Auth session persists
 setPersistence(auth, browserLocalPersistence);
 
-// HTML Elements
+// Elements
 const loginForm = document.getElementById("loginForm");
 const identifierInput = document.getElementById("identifier");
 const passwordInput = document.getElementById("password");
@@ -35,74 +43,80 @@ const changePasswordForm = document.getElementById("changePasswordForm");
 const newPasswordInput = document.getElementById("newPassword");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 
+let currentStudentDocId = "";
 let currentUserEmail = "";
 
-// ----- LOGIN -----
+/* ---------------- LOGIN ---------------- */
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const identifier = identifierInput.value.trim();
   const password = passwordInput.value;
 
   try {
     let email = identifier;
 
-    // If phone number entered → find email from Firestore
+    // Login with phone
     if (/^\d+$/.test(identifier)) {
-      const q = query(collection(db, "Students"), where("phone", "==", identifier));
-      const querySnapshot = await getDocs(q);
+      const phoneSnap = await getDocs(
+        query(collection(db, "Students"), where("phone", "==", identifier))
+      );
 
-      if (querySnapshot.empty) {
+      if (phoneSnap.empty) {
         alert("User not found");
         return;
       }
 
-      const studentDoc = querySnapshot.docs[0];
-      if (!studentDoc) {
-        alert("User record not found");
-        return;
-      }
-
-      email = studentDoc.data().Email; // ✅ Correct capitalization
+      const data = phoneSnap.docs[0].data();
+      email = data.Email || data.EMAIL;
     }
 
-    // Firebase Auth login
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    email = email.toLowerCase();
     currentUserEmail = email;
 
-    // Get student record from Firestore by Email
-    const q = query(collection(db, "Students"), where("Email", "==", email));
-    const snapshot = await getDocs(q);
+    // Firebase Auth
+    await signInWithEmailAndPassword(auth, email, password);
 
-    if (snapshot.empty) {
-      alert("Student record not found");
+    // Try Email
+    let studentSnap = await getDocs(
+      query(collection(db, "Students"), where("Email", "==", email))
+    );
+
+    // Try EMAIL (new form)
+    if (studentSnap.empty) {
+      studentSnap = await getDocs(
+        query(collection(db, "Students"), where("EMAIL", "==", email))
+      );
+    }
+
+    if (studentSnap.empty) {
+      alert("Student record exists but field mismatch");
       return;
     }
 
-    const studentDoc = snapshot.docs[0];
-    if (!studentDoc) {
-      alert("Student record undefined");
-      return;
-    }
-
+    const studentDoc = studentSnap.docs[0];
     const studentData = studentDoc.data();
+    currentStudentDocId = studentDoc.id;
 
-    if (studentData.firstLogin === true) {
-      // Show change password form
+    const isFirstLogin =
+      studentData.firstLogin === true ||
+      studentData.FirstLogin === true ||
+      studentData.firstLogin === undefined;
+
+    if (isFirstLogin) {
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
-      // Already logged in → dashboard
       window.location.href = "student-dashboard.html";
     }
 
-  } catch (error) {
-    console.error(error);
-    alert("Login failed: " + error.message);
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
   }
 });
 
-// ----- CHANGE PASSWORD -----
+/* ---------------- CHANGE PASSWORD ---------------- */
 changePasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -110,43 +124,30 @@ changePasswordForm.addEventListener("submit", async (e) => {
   const confirmPassword = confirmPasswordInput.value.trim();
 
   if (newPassword !== confirmPassword) {
-    alert("Passwords do not match!");
+    alert("Passwords do not match");
     return;
   }
 
   if (newPassword.length < 6) {
-    alert("Password must be at least 6 characters!");
+    alert("Password must be at least 6 characters");
     return;
   }
 
   try {
     const user = auth.currentUser;
-    if (!user) {
-      alert("User session expired. Please login again.");
-      window.location.href = "studentlogin.html";
-      return;
-    }
+    if (!user) throw new Error("Session expired");
 
-    // Update Firebase Auth password
     await updatePassword(user, newPassword);
 
-    // Update firstLogin = false in Firestore
-    const q = query(collection(db, "Students"), where("Email", "==", currentUserEmail));
-    const snapshot = await getDocs(q);
+    await updateDoc(doc(db, "Students", currentStudentDocId), {
+      firstLogin: false
+    });
 
-    if (snapshot.empty) {
-      alert("Student record not found");
-      return;
-    }
-
-    const studentDoc = snapshot.docs[0];
-    await updateDoc(doc(db, "Students", studentDoc.id), { firstLogin: false });
-
-    alert("Password updated successfully!");
+    alert("Password updated successfully");
     window.location.href = "student-dashboard.html";
 
   } catch (err) {
     console.error(err);
-    alert("Failed to update password: " + err.message);
+    alert(err.message);
   }
 });
