@@ -1,8 +1,13 @@
+// ===== IMPORTS =====
+// Make sure your script tag in HTML uses type="module":
+// <script type="module" src="profile.js"></script>
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// FIREBASE CONFIG
+/* ===============================
+   FIREBASE CONFIG
+================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -16,7 +21,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// HELPER FUNCTIONS
+/* ===============================
+   HELPERS
+================================ */
 const setText = (id, value) => {
   const el = document.getElementById(id);
   if (el) el.innerText = value || "-";
@@ -25,19 +32,33 @@ const setText = (id, value) => {
 const setImage = (id, url) => {
   const el = document.getElementById(id);
   if (!el) return;
+
   if (url) {
     let link = url;
     if (link.includes("drive.google.com")) {
       const match = link.match(/[-\w]{25,}/);
-      if (match) link = `https://drive.google.com/uc?export=view&id=${match[0]}`;
+      if (match) {
+        link = `https://drive.google.com/uc?export=view&id=${match[0]}`;
+      }
     }
     el.src = link;
   } else {
-    el.src = "default-avatar.png";
+    el.src = "default-avatar.png"; // fallback avatar
   }
 };
 
-// LOAD PROFILE DATA
+// Format DOB like 01 Jan 2003
+const formatDOB = (dobStr) => {
+  if (!dobStr) return "-";
+  const date = new Date(dobStr);
+  if (isNaN(date)) return dobStr; // fallback if invalid
+  const options = { day: "2-digit", month: "short", year: "numeric" };
+  return date.toLocaleDateString("en-US", options);
+};
+
+/* ===============================
+   AUTH + LOAD PROFILE DATA
+================================ */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
@@ -45,8 +66,9 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   let data = null;
+
   try {
-    // 1️⃣ Try email-based doc ID
+    // 1️⃣ Try email-based document ID
     const docId = user.email.replace(/[@.]/g, "_");
     const ref = doc(db, "Students", docId);
     const snap = await getDoc(ref);
@@ -54,24 +76,27 @@ onAuthStateChanged(auth, async (user) => {
     if (snap.exists()) {
       data = snap.data();
     } else {
-      // 2️⃣ Fallback query by email field
-      const q = query(collection(db, "Students"), where("email", "==", user.email));
+      // 2️⃣ Fallback: query by email field
+      const q = query(
+        collection(db, "Students"),
+        where("email", "==", user.email)
+      );
       const qs = await getDocs(q);
       if (!qs.empty) data = qs.docs[0].data();
     }
 
     if (!data) return;
 
-    // PERSONAL INFO
+    // ===== PERSONAL INFO =====
     setText("name", data.name);
     setText("cardName", data.name);
-    setText("dob", data.dob);
+    setText("dob", formatDOB(data.dob));
     setText("gender", data.gender);
     setText("email", data.email);
     setText("phone", data.phone);
     setText("address", data.address);
 
-    // ACADEMIC DETAILS
+    // ===== ACADEMIC DETAILS =====
     setText("program", data.program);
     setText("program2", data.program);
     setText("batchYear", data.batchYear);
@@ -81,14 +106,14 @@ onAuthStateChanged(auth, async (user) => {
     setText("studentId", data.studentId);
     setText("modeOfStudy", data.modeOfStudy);
 
-    // PARENTS / GUARDIAN
+    // ===== PARENTS / GUARDIAN =====
     setText("fatherName", data.fatherName);
     setText("fatherPhone", data.fatherPhone);
     setText("motherName", data.motherName);
     setText("motherPhone", data.motherPhone);
     setText("guardian", data.guardian);
 
-    // PROFILE PHOTOS
+    // ===== PROFILE PHOTOS =====
     setImage("profilePhoto", data.photoUrl);
     setImage("navPhoto", data.photoUrl);
 
