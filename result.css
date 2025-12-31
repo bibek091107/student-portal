@@ -9,12 +9,6 @@ body {
   background: #eef2f7;
 }
 
-/* IMPORTANT FIX */
-.section {
-  display: block;   /* 🔥 WAS HIDING EVERYTHING */
-  padding: 20px;
-}
-
 /* ===== SIDEBAR ===== */
 .sidebar {
   width: 240px;
@@ -22,6 +16,30 @@ body {
   color: white;
   height: 100vh;
   position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.sidebar h2 {
+  text-align: center;
+  padding: 20px 0;
+  margin: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  padding: 14px 20px;
+  cursor: pointer;
+}
+
+.sidebar li:hover {
+  background: #2563eb;
 }
 
 .sidebar li.active {
@@ -37,11 +55,73 @@ body {
 /* ===== NAVBAR ===== */
 .navbar {
   background: white;
-  padding: 12px 20px;
+  padding: 14px 20px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+.navbar h3 {
+  margin: 0;
+}
 
+/* ===== SECTION ===== */
+.section {
+  padding: 20px;
+}
+
+/* ===== RESULTS GRID ===== */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 25px;
+}
+
+/* ===== CARDS (SAME AS ATTENDANCE / NOTICES) ===== */
+.wide-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.wide-card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #1e3a8a;
+}
+
+/* ===== TABLE STYLE ===== */
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.profile-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-table tr:last-child td {
+  border-bottom: none;
+}
+
+.profile-table strong {
+  color: #1f2937;
+}
+
+/* ===== LOGOUT ===== */
 #logoutBtn:hover {
   background: #b91c1c;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+  }
 }
