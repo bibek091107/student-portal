@@ -64,7 +64,7 @@ onAuthStateChanged(auth, async (user) => {
     if (emailSnap.exists()) {
       data = emailSnap.data();
     } else {
-      // 2️⃣ Try new method (query by Email field)
+      // 2️⃣ Try new method (query by email field)
       const q = query(
         collection(db, "Students"),
         where("email", "==", user.email)
@@ -95,15 +95,23 @@ onAuthStateChanged(auth, async (user) => {
     // 5️⃣ Nav profile image
     if (data.photoUrl) {
       const img = document.createElement("img");
-      img.src = data.photoUrl;
+      // Ensure the Google Drive link is in "uc?export=view&id=" format
+      img.src = data.photoUrl.includes("drive.google.com") && !data.photoUrl.includes("uc?export=view")
+        ? data.photoUrl.replace("/open?id=", "/uc?export=view&id=")
+        : data.photoUrl;
+
       img.alt = "Profile";
       img.style.width = "50px";
       img.style.height = "50px";
       img.style.borderRadius = "50%";
       img.style.objectFit = "cover";
-      // Replace emoji with image
+
+      // Replace the emoji with the image
       navProfileContainer.innerHTML = "";
       navProfileContainer.appendChild(img);
+    } else {
+      // Fallback if no photo
+      navProfileContainer.innerText = "👤";
     }
 
   } catch (err) {
