@@ -65,6 +65,15 @@ body {
 }
 
 /* ===== NAVBAR ===== */
+.nav-profile {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;   /* ✅ ensures the image fits nicely */
+  border: 2px solid #2563eb; /* optional: adds a border */
+  background: #ddd;     /* optional: placeholder bg while image loads */
+}
+
 .navbar {
   background: #ffffff;
   padding: 12px 20px;
