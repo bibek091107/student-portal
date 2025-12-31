@@ -7,12 +7,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
-  collection,
-  query,
-  where,
-  getDocs
+  doc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* ===============================
+   FIREBASE CONFIG
+================================ */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -22,21 +23,30 @@ const firebaseConfig = {
   appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
 };
 
-// Init
+// Init Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Elements
+/* ===============================
+   ELEMENTS
+================================ */
 const welcomeEl = document.getElementById("welcomeText");
 const nameEl = document.getElementById("profileName");
 const emailEl = document.getElementById("profileEmail");
 const studentIdEl = document.getElementById("profileStudentId");
 const regNoEl = document.getElementById("profileRegNo");
 const programEl = document.getElementById("profileProgram");
+
+const attendanceEl = document.getElementById("attendancePercent");
+const totalCoursesEl = document.getElementById("totalCourses");
+const performanceEl = document.getElementById("overallPerformance");
+
 const logoutBtn = document.getElementById("logoutBtn");
 
-// Auth check
+/* ===============================
+   AUTH + LOAD DATA
+================================ */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
@@ -45,16 +55,14 @@ onAuthStateChanged(auth, async (user) => {
 
   emailEl.innerText = user.email;
 
+  // Firestore document ID
+  const docId = user.email.replace(/[@.]/g, "_");
+
   try {
-    // 🔥 SEARCH STUDENT BY EMAIL
-    const q = query(
-      collection(db, "Students"),
-      where("Email", "==", user.email)
-    );
+    const ref = doc(db, "Students", docId);
+    const snap = await getDoc(ref);
 
-    const snapshot = await getDocs(q);
-
-    if (snapshot.empty) {
+    if (!snap.exists()) {
       welcomeEl.innerText = "Welcome";
       nameEl.innerText = "Profile not found";
       studentIdEl.innerText = "-";
@@ -63,42 +71,43 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    // Take first matching document
-    const data = snapshot.docs[0].data();
+    const data = snap.data();
 
+    /* ===== PROFILE ===== */
     welcomeEl.innerText = `Welcome, ${data["Name"] || "Student"}`;
     nameEl.innerText = data["Name"] || "-";
     studentIdEl.innerText = data["Student Id/Teacher ID"] || "-";
     regNoEl.innerText = data["Reg No."] || "-";
     programEl.innerText = data["Program/Course"] || "-";
 
-  } catch (error) {
-    console.error(error);
-    nameEl.innerText = "Error loading profile";
+    /* ===== DASHBOARD FIGURES ===== */
+
+    // Attendance %
+    const attendance = data.attendancePercent || 0;
+    attendanceEl.innerText = attendance + "%";
+
+    // Courses count
+    const coursesCount = data.courses?.length || 0;
+    totalCoursesEl.innerText = coursesCount;
+
+    // Performance logic
+    let performance = "Average";
+    if (attendance >= 85) performance = "Excellent";
+    else if (attendance >= 75) performance = "Good";
+    else performance = "Needs Improvement";
+
+    performanceEl.innerText = performance;
+
+  } catch (err) {
+    console.error("Dashboard error:", err);
+    nameEl.innerText = "Error loading data";
   }
 });
 
-// Logout
+/* ===============================
+   LOGOUT
+================================ */
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "studentlogin.html";
 });
-
-// Sidebar navigation
-const navItems = document.querySelectorAll(".sidebar li[data-section]");
-const sections = document.querySelectorAll(".section");
-
-navItems.forEach(item => {
-  item.addEventListener("click", () => {
-    // Remove active class
-    navItems.forEach(i => i.classList.remove("active"));
-    sections.forEach(sec => sec.classList.remove("active"));
-
-    // Activate clicked
-    item.classList.add("active");
-    document
-      .getElementById(item.dataset.section)
-      .classList.add("active");
-  });
-});
-
