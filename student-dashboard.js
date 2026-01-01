@@ -1,18 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* FIREBASE CONFIG */
 const firebaseConfig = {
@@ -56,10 +44,7 @@ onAuthStateChanged(auth, async (user) => {
     if (snap.exists()) {
       data = snap.data();
     } else {
-      const q = query(
-        collection(db, "Students"),
-        where("email", "==", user.email)
-      );
+      const q = query(collection(db, "Students"), where("email", "==", user.email));
       const qs = await getDocs(q);
       if (!qs.empty) data = qs.docs[0].data();
     }
@@ -72,12 +57,12 @@ onAuthStateChanged(auth, async (user) => {
     regNoEl.innerText = data.regNo || "-";
     programEl.innerText = data.program || "-";
 
-    navImg.src =
-      data.photoUrl && data.photoUrl.trim() !== ""
-        ? data.photoUrl
-        : "default-avatar.png";
+    // Set profile image — if photo not uploaded yet, show default avatar
+    navImg.src = data.photoUrl && data.photoUrl.trim() !== ""
+      ? data.photoUrl
+      : "default-avatar.png";
 
-    navImg.onerror = () => (navImg.src = "default-avatar.png");
+    navImg.onerror = () => { navImg.src = "default-avatar.png"; };
 
   } catch (err) {
     console.error(err);
