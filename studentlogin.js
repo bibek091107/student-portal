@@ -29,18 +29,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 setPersistence(auth, browserLocalPersistence);
 
 /* ================= ELEMENTS ================= */
 const loginForm = document.getElementById("loginForm");
 const identifierInput = document.getElementById("identifier");
 const passwordInput = document.getElementById("password");
-
 const loginContainer = document.getElementById("loginContainer");
 const changePasswordContainer = document.getElementById("changePasswordContainer");
 const changePasswordForm = document.getElementById("changePasswordForm");
-
 const newPasswordInput = document.getElementById("newPassword");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 
@@ -92,8 +89,7 @@ loginForm.addEventListener("submit", async (e) => {
     currentStudentDocId = studentDoc.id;
 
     const isFirstLogin =
-      studentData.firstLogin === true ||
-      studentData.firstLogin === undefined;
+      studentData.firstLogin === true || studentData.firstLogin === undefined;
 
     // 🚫 If photo already uploaded → dashboard
     if (studentData.photoLocked === true) {
@@ -106,7 +102,7 @@ loginForm.addEventListener("submit", async (e) => {
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
-      // 🔁 Password done but photo not uploaded
+      // Password updated but photo not uploaded
       window.location.href = "upload-photo.html";
     }
 
@@ -139,12 +135,12 @@ changePasswordForm.addEventListener("submit", async (e) => {
 
     await updatePassword(user, newPassword);
 
-    // ✅ Mark password updated but photo still required
+    // ✅ Mark first login done, photo still required
     await updateDoc(doc(db, "Students", currentStudentDocId), {
       firstLogin: false
     });
 
-    alert("Password updated successfully");
+    alert("Password updated successfully!");
     window.location.href = "upload-photo.html";
 
   } catch (err) {
