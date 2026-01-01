@@ -1,13 +1,35 @@
+// ===================== IMPORT FIREBASE =====================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Elements
+// ===================== FIREBASE CONFIG =====================
+const firebaseConfig = {
+  apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
+  authDomain: "student-management-syste-e3edc.firebaseapp.com",
+  projectId: "student-management-syste-e3edc",
+  storageBucket: "student-management-syste-e3edc.appspot.com",
+  messagingSenderId: "674803364755",
+  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+const db = getFirestore(app);
+
+// ===================== ELEMENTS =====================
 const photoInput = document.getElementById("photoInput");
 const previewImg = document.getElementById("previewImg");
 const statusEl = document.getElementById("status");
 const uploadBtn = document.getElementById("uploadBtn");
 
-// Preview image
+// ===================== GLOBAL VARIABLES =====================
+// These variables must be set after login (from studentlogin.js)
+let currentUserEmail = localStorage.getItem("studentEmail") || ""; 
+let currentStudentDocId = localStorage.getItem("studentDocId") || "";
+
+// ===================== IMAGE PREVIEW =====================
 photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
   if (!file) return;
@@ -20,7 +42,7 @@ photoInput.addEventListener("change", () => {
   previewImg.src = URL.createObjectURL(file);
 });
 
-// Upload function
+// ===================== UPLOAD PHOTO =====================
 uploadBtn.addEventListener("click", async () => {
   const file = photoInput.files[0];
   if (!file) {
@@ -28,19 +50,24 @@ uploadBtn.addEventListener("click", async () => {
     return;
   }
 
+  if (!currentUserEmail || !currentStudentDocId) {
+    alert("Session expired. Login again.");
+    window.location.href = "studentlogin.html";
+    return;
+  }
+
   statusEl.textContent = "Uploading...";
-  uploadBtn.disabled = true;
 
   try {
-    // Upload to Firebase Storage
-    const storage = getStorage(app);
     const storageRef = ref(storage, `student-photos/${currentUserEmail}_${file.name}`);
+    
+    // Upload file
     await uploadBytes(storageRef, file);
 
-    // Get public URL
+    // Get URL
     const photoURL = await getDownloadURL(storageRef);
 
-    // Save URL in Firestore
+    // Update Firestore
     const studentDocRef = doc(db, "Students", currentStudentDocId);
     await updateDoc(studentDocRef, {
       photoUrl: photoURL,
@@ -48,7 +75,7 @@ uploadBtn.addEventListener("click", async () => {
       photoConfirmedAt: new Date()
     });
 
-    statusEl.textContent = "Photo uploaded successfully!";
+    statusEl.textContent = "Uploaded successfully!";
     
     // Redirect to dashboard
     setTimeout(() => {
@@ -58,6 +85,5 @@ uploadBtn.addEventListener("click", async () => {
   } catch (err) {
     console.error(err);
     statusEl.textContent = "Upload failed: " + err.message;
-    uploadBtn.disabled = false;
   }
 });
