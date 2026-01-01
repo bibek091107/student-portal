@@ -1,8 +1,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* FIREBASE CONFIG */
+/* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -16,7 +28,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ELEMENTS */
+/* ================= ELEMENTS ================= */
 const welcomeEl = document.getElementById("welcomeText");
 const nameEl = document.getElementById("profileName");
 const emailEl = document.getElementById("profileEmail");
@@ -26,51 +38,61 @@ const programEl = document.getElementById("profileProgram");
 const logoutBtn = document.getElementById("logoutBtn");
 const navImg = document.getElementById("navProfileImg");
 
-/* AUTH CHECK */
+/* ================= DEFAULT AVATAR ================= */
+const DEFAULT_AVATAR = "default-avatar.png"; // Make sure this file exists in your repo
+
+/* ================= AUTH CHECK ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    // Not logged in → redirect
     window.location.href = "studentlogin.html";
     return;
   }
 
   emailEl.innerText = user.email;
-  let data = null;
 
   try {
+    let studentData = null;
     const docId = user.email.replace(/[@.]/g, "_");
-    const ref = doc(db, "Students", docId);
-    const snap = await getDoc(ref);
 
-    if (snap.exists()) {
-      data = snap.data();
+    // Try fetching by doc ID first
+    const docRef = doc(db, "Students", docId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      studentData = docSnap.data();
     } else {
+      // Fallback: query by email
       const q = query(collection(db, "Students"), where("email", "==", user.email));
       const qs = await getDocs(q);
-      if (!qs.empty) data = qs.docs[0].data();
+      if (!qs.empty) studentData = qs.docs[0].data();
     }
 
-    if (!data) throw new Error("Student record not found");
+    if (!studentData) throw new Error("Student record not found");
 
-    welcomeEl.innerText = `Welcome, ${data.name || "Student"}`;
-    nameEl.innerText = data.name || "-";
-    studentIdEl.innerText = data.studentId || "-";
-    regNoEl.innerText = data.regNo || "-";
-    programEl.innerText = data.program || "-";
+    // Update dashboard elements
+    welcomeEl.innerText = `Welcome, ${studentData.name || "Student"}`;
+    nameEl.innerText = studentData.name || "-";
+    studentIdEl.innerText = studentData.studentId || "-";
+    regNoEl.innerText = studentData.regNo || "-";
+    programEl.innerText = studentData.program || "-";
 
-    // Set profile image — if photo not uploaded yet, show default avatar
-    navImg.src = data.photoUrl && data.photoUrl.trim() !== ""
-      ? data.photoUrl
-      : "default-avatar.png";
+    // Cloudinary photo or default avatar
+    navImg.src =
+      studentData.photoUrl && studentData.photoUrl.trim() !== ""
+        ? studentData.photoUrl
+        : DEFAULT_AVATAR;
 
-    navImg.onerror = () => { navImg.src = "default-avatar.png"; };
+    // Fallback if image fails to load
+    navImg.onerror = () => (navImg.src = DEFAULT_AVATAR);
 
   } catch (err) {
     console.error(err);
-    navImg.src = "default-avatar.png";
+    navImg.src = DEFAULT_AVATAR;
   }
 });
 
-/* LOGOUT */
+/* ================= LOGOUT ================= */
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "studentlogin.html";
