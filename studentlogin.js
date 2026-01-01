@@ -16,7 +16,7 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase config
+/* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -32,13 +32,15 @@ const db = getFirestore(app);
 
 setPersistence(auth, browserLocalPersistence);
 
-// Elements
+/* ================= ELEMENTS ================= */
 const loginForm = document.getElementById("loginForm");
 const identifierInput = document.getElementById("identifier");
 const passwordInput = document.getElementById("password");
+
 const loginContainer = document.getElementById("loginContainer");
 const changePasswordContainer = document.getElementById("changePasswordContainer");
 const changePasswordForm = document.getElementById("changePasswordForm");
+
 const newPasswordInput = document.getElementById("newPassword");
 const confirmPasswordInput = document.getElementById("confirmPassword");
 
@@ -55,7 +57,7 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // ---- LOGIN WITH PHONE ----
+    // ---- LOGIN WITH PHONE NUMBER ----
     if (/^\d+$/.test(identifier)) {
       const phoneSnap = await getDocs(
         query(collection(db, "Students"), where("phone", "==", identifier))
@@ -66,23 +68,22 @@ loginForm.addEventListener("submit", async (e) => {
         return;
       }
 
-      const data = phoneSnap.docs[0].data();
-      email = data.email; // ✅ lowercase
+      email = phoneSnap.docs[0].data().email;
     }
 
     email = email.toLowerCase();
     currentUserEmail = email;
 
-    // ---- FIREBASE AUTH ----
+    // ---- AUTH LOGIN ----
     await signInWithEmailAndPassword(auth, email, password);
 
-    // ---- GET STUDENT RECORD ----
+    // ---- GET STUDENT DOCUMENT ----
     const studentSnap = await getDocs(
       query(collection(db, "Students"), where("email", "==", email))
     );
 
     if (studentSnap.empty) {
-      alert("Student record not found in database");
+      alert("Student record not found");
       return;
     }
 
@@ -90,16 +91,23 @@ loginForm.addEventListener("submit", async (e) => {
     const studentData = studentDoc.data();
     currentStudentDocId = studentDoc.id;
 
-    // ---- FIRST LOGIN CHECK ----
     const isFirstLogin =
       studentData.firstLogin === true ||
       studentData.firstLogin === undefined;
 
+    // 🚫 If photo already uploaded → dashboard
+    if (studentData.photoLocked === true) {
+      window.location.href = "student-dashboard.html";
+      return;
+    }
+
+    // 🔐 First login → change password
     if (isFirstLogin) {
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
-      window.location.href = "student-dashboard.html";
+      // 🔁 Password done but photo not uploaded
+      window.location.href = "upload-photo.html";
     }
 
   } catch (err) {
@@ -131,12 +139,13 @@ changePasswordForm.addEventListener("submit", async (e) => {
 
     await updatePassword(user, newPassword);
 
+    // ✅ Mark password updated but photo still required
     await updateDoc(doc(db, "Students", currentStudentDocId), {
       firstLogin: false
     });
 
     alert("Password updated successfully");
-    window.location.href = "student-dashboard.html";
+    window.location.href = "upload-photo.html";
 
   } catch (err) {
     console.error(err);
