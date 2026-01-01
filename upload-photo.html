@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Passport Photo</title>
+</head>
+<body>
+
+<h2>Upload Passport Size Photo</h2>
+
+<p>
+  Instructions:
+  <br>• Upload clear passport size photo
+  <br>• Face must be clearly visible
+  <br>• You can upload only once
+</p>
+
+<form 
+  action="https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse"
+  method="POST"
+  enctype="multipart/form-data"
+  target="_self"
+>
+
+  <!-- Replace entry.XXXX with your photo upload field -->
+  <label>Upload Photo:</label><br>
+  <input type="file" name="entry.1234567890" accept="image/*" required>
+
+  <br><br>
+
+  <button type="submit">Submit Photo</button>
+
+</form>
+
+<p>
+  After submitting, you will be redirected to your dashboard.
+</p>
+
+</body>
+</html>
