@@ -4,24 +4,97 @@
   <meta charset="UTF-8">
   <title>Upload Passport Photo</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #eef2f7; }
-    h2 { color: #2563eb; }
-    #previewImg { margin-top: 15px; width: 150px; height: 150px; object-fit: cover; border: 2px solid #2563eb; border-radius: 8px; display: none; }
-    #status { margin-top: 15px; font-weight: bold; }
-    button { padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    button:disabled { background: #aaa; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f2f5;
+    }
+    h2 {
+      color: #1e3a8a;
+    }
+    #previewImg {
+      display: block;
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    button {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
   </style>
 </head>
 <body>
 
 <h2>Upload Passport Size Photo</h2>
-<p>Face must be clearly visible. You can upload only once.</p>
+<p>Face must be clearly visible. Upload only once.</p>
 
-<input type="file" id="photoInput" accept="image/*"><br>
-<img id="previewImg" alt="Preview"><br><br>
-<button id="uploadBtn">Upload Photo</button>
+<input type="file" id="photoInput" accept="image/*">
+<img id="previewImg" src="" alt="Preview">
+<br>
+<button onclick="uploadPhoto()">Upload</button>
 <p id="status"></p>
+<script type="module" src="upload-photo.js"></script>
+<script>
+  const photoInput = document.getElementById("photoInput");
+  const previewImg = document.getElementById("previewImg");
+  const statusEl = document.getElementById("status");
 
-<script type="module" src="update-photo.js"></script>
+  // Preview the selected image
+  photoInput.addEventListener("change", () => {
+    const file = photoInput.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files are allowed!");
+      photoInput.value = "";
+      previewImg.src = "";
+      return;
+    }
+    previewImg.src = URL.createObjectURL(file);
+  });
+
+  // Upload function
+  function uploadPhoto() {
+    const file = photoInput.files[0];
+    if (!file) {
+      alert("Please select a photo first!");
+      return;
+    }
+
+    statusEl.textContent = "Uploading...";
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const arrayBuffer = e.target.result;
+      const blob = Utilities.newBlob(arrayBuffer, file.type, file.name);
+
+      google.script.run
+        .withSuccessHandler((res) => {
+          if (res.status === "success") {
+            statusEl.textContent = "Photo uploaded successfully! URL: " + res.url;
+          } else {
+            statusEl.textContent = "Upload failed: " + res.message;
+          }
+        })
+        .uploadPhoto({ myFile: blob });
+    };
+    reader.readAsArrayBuffer(file);
+  }
+</script>
+
 </body>
 </html>
