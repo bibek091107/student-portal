@@ -1,17 +1,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 /* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
-  projectId: "student-management-syste-e3edc"
+  projectId: "student-management-syste-e3edc",
+  storageBucket: "student-management-syste-e3edc.appspot.com"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 /* ================= ELEMENTS ================= */
 const fileInput = document.getElementById("photoInput");
@@ -33,7 +36,6 @@ onAuthStateChanged(auth, async (user) => {
     studentDocRef = doc(db, "Students", docId);
 
     const snap = await getDoc(studentDocRef);
-
     if (!snap.exists()) {
       alert("Student record not found");
       await signOut(auth);
@@ -42,7 +44,7 @@ onAuthStateChanged(auth, async (user) => {
 
     const data = snap.data();
 
-    // 🚫 Block if photo already uploaded or locked
+    // Block if photo already uploaded
     if ((data.photoUrl && data.photoUrl.trim() !== "") || data.photoLocked === true) {
       window.location.href = "student-dashboard.html";
     }
@@ -81,13 +83,14 @@ uploadBtn.addEventListener("click", async () => {
   statusEl.innerText = "Uploading photo...";
 
   try {
-    // ----------------------------
-    // ✅ In this setup, photo is "confirmed"
-    // (The file itself is uploaded via Google Form or Drive already)
-    // We just mark it in Firestore as locked and save the URL
-    // ----------------------------
+    // 1️⃣ Upload to Firebase Storage
+    const storageRef = ref(storage, `studentPhotos/${file.name}_${Date.now()}`);
+    await uploadBytes(storageRef, file);
 
-    const photoUrl = previewImg.src; // Assuming you have already uploaded it somewhere or using preview URL
+    // 2️⃣ Get permanent URL
+    const photoUrl = await getDownloadURL(storageRef);
+
+    // 3️⃣ Update Firestore
     await updateDoc(studentDocRef, {
       photoUrl: photoUrl,
       photoLocked: true,
@@ -96,7 +99,7 @@ uploadBtn.addEventListener("click", async () => {
     });
 
     statusEl.innerText = "Photo uploaded successfully! Redirecting...";
-    setTimeout(() => window.location.href = "student-dashboard.html", 1200);
+    setTimeout(() => window.location.href = "student-dashboard.html", 1500);
 
   } catch (err) {
     console.error("Upload error:", err);
