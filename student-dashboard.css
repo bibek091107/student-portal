@@ -86,14 +86,18 @@ body {
   z-index: 10;
 }
 
-logoutBtn {
+/* FIXED LOGOUT BUTTON */
+#logoutBtn {
   margin-top: 20px;
   background: #dc2626;
+  color: white;
 }
 
-logoutBtn:hover {
+#logoutBtn:hover {
   background: #b91c1c;
 }
+
+
 
 
 .nav-right {
