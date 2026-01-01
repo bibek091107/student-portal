@@ -1,37 +1,13 @@
-// -------------------- IMPORTS --------------------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+// upload-photo.js
 
-// -------------------- FIREBASE CONFIG --------------------
-const firebaseConfig = {
-  apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
-  authDomain: "student-management-syste-e3edc.firebaseapp.com",
-  projectId: "student-management-syste-e3edc",
-  storageBucket: "student-management-syste-e3edc.appspot.com",
-  messagingSenderId: "674803364755",
-  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
-};
+const CLOUD_NAME = "drfbfelhl"; // your Cloudinary cloud name
+const UPLOAD_PRESET = "student_photo_upload"; // your unsigned preset
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-
-// -------------------- ELEMENTS --------------------
 const photoInput = document.getElementById("photoInput");
 const previewImg = document.getElementById("previewImg");
-const uploadBtn = document.getElementById("uploadBtn");
 const statusEl = document.getElementById("status");
 
-// -------------------- VARIABLES --------------------
-// These must come from your login page/session
-let currentUserEmail = localStorage.getItem("studentEmail"); 
-let currentStudentDocId = localStorage.getItem("studentDocId");
-
-// -------------------- IMAGE PREVIEW --------------------
+// Preview image when selected
 photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
   if (!file) return;
@@ -44,8 +20,8 @@ photoInput.addEventListener("change", () => {
   previewImg.src = URL.createObjectURL(file);
 });
 
-// -------------------- UPLOAD FUNCTION --------------------
-uploadBtn.addEventListener("click", async () => {
+// Upload photo to Cloudinary
+async function uploadPhoto() {
   const file = photoInput.files[0];
   if (!file) {
     alert("Please select a photo first!");
@@ -54,29 +30,35 @@ uploadBtn.addEventListener("click", async () => {
 
   statusEl.textContent = "Uploading...";
 
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
+
   try {
-    // Upload to Firebase Storage
-    const storageRef = ref(storage, `student-photos/${currentUserEmail}_${file.name}`);
-    await uploadBytes(storageRef, file);
-
-    // Get download URL
-    const photoURL = await getDownloadURL(storageRef);
-
-    // Save URL in Firestore
-    const studentDocRef = doc(db, "Students", currentStudentDocId);
-    await updateDoc(studentDocRef, {
-      photoUrl: photoURL,
-      photoLocked: true,
-      photoConfirmedAt: new Date()
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`, {
+      method: "POST",
+      body: formData
     });
 
-    statusEl.textContent = "Photo uploaded successfully! Redirecting...";
-    setTimeout(() => {
-      window.location.href = "student-dashboard.html";
-    }, 1200);
+    const data = await res.json();
 
+    if (data.secure_url) {
+      statusEl.textContent = "Photo uploaded successfully!";
+      console.log("Cloudinary URL:", data.secure_url);
+
+      // Optionally save the URL to Firestore here using your existing Firebase JS logic
+      // Example:
+      // const studentDocRef = doc(db, "Students", currentStudentDocId);
+      // await updateDoc(studentDocRef, { photoUrl: data.secure_url, photoLocked: true });
+
+      // Redirect after upload
+      setTimeout(() => { window.location.href = "student-dashboard.html"; }, 1000);
+    } else {
+      statusEl.textContent = "Upload failed!";
+      console.error(data);
+    }
   } catch (err) {
+    statusEl.textContent = "Upload error!";
     console.error(err);
-    statusEl.textContent = "Upload failed: " + err.message;
   }
-});
+}
