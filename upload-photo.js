@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
@@ -39,72 +39,85 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const docId = user.email.replace(/[@.]/g, "_");
-  studentDocRef = doc(db, "Students", docId);
+  try {
+    const docId = user.email.replace(/[@.]/g, "_");
+    studentDocRef = doc(db, "Students", docId);
 
-  const snap = await getDoc(studentDocRef);
+    const snap = await getDoc(studentDocRef);
 
-  if (!snap.exists()) {
-    alert("Student record not found");
-    auth.signOut();
-    return;
-  }
+    if (!snap.exists()) {
+      alert("Student record not found");
+      await signOut(auth);
+      return;
+    }
 
-  const data = snap.data();
+    const data = snap.data();
 
-  // 🚫 Block if photo already uploaded
-  if (data.photoUrl && data.photoUrl.trim() !== "") {
-    window.location.href = "student-dashboard.html";
+    // 🚫 Block if photo already uploaded or locked
+    if (
+      (data.photoUrl && data.photoUrl.trim() !== "") ||
+      data.photoLocked === true
+    ) {
+      window.location.href = "student-dashboard.html";
+    }
+
+  } catch (err) {
+    console.error("Auth check error:", err);
+    alert("Something went wrong. Contact admin.");
+    await signOut(auth);
   }
 });
 
 /* ===============================
    PREVIEW IMAGE
 ================================ */
-fileInput.addEventListener("change", () => {
-  const file = fileInput.files[0];
-  if (!file) return;
+if (fileInput) {
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
 
-  if (!file.type.startsWith("image/")) {
-    alert("Only image files allowed");
-    fileInput.value = "";
-    return;
-  }
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files allowed");
+      fileInput.value = "";
+      return;
+    }
 
-  previewImg.src = URL.createObjectURL(file);
-});
+    previewImg.src = URL.createObjectURL(file);
+  });
+}
 
 /* ===============================
    UPLOAD HANDLER
 ================================ */
-uploadBtn.addEventListener("click", async () => {
-  const file = fileInput.files[0];
+if (uploadBtn) {
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
 
-  if (!file) {
-    alert("Please select a photo");
-    return;
-  }
+    if (!file) {
+      alert("Please select a photo");
+      return;
+    }
 
-  uploadBtn.disabled = true;
-  statusEl.innerText = "Uploading photo...";
+    uploadBtn.disabled = true;
+    statusEl.innerText = "Finalizing photo upload...";
 
-  /*
-    IMPORTANT:
-    At this point you ALREADY upload photos via:
-    Google Form → Apps Script → Drive → Firestore
+    try {
+      await updateDoc(studentDocRef, {
+        photoLocked: true,
+        firstLogin: false,
+        photoConfirmedAt: new Date()
+      });
 
-    So here we DO NOT upload again.
-    We ONLY block further uploads and redirect.
-  */
+      statusEl.innerText = "Photo uploaded successfully";
 
-  await updateDoc(studentDocRef, {
-    photoLocked: true,
-    firstLogin: false
+      setTimeout(() => {
+        window.location.href = "student-dashboard.html";
+      }, 1200);
+
+    } catch (err) {
+      console.error("Upload finalize error:", err);
+      statusEl.innerText = "Upload failed. Try again.";
+      uploadBtn.disabled = false;
+    }
   });
-
-  statusEl.innerText = "Photo uploaded successfully";
-
-  setTimeout(() => {
-    window.location.href = "student-dashboard.html";
-  }, 1200);
-});
+}
