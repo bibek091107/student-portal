@@ -7,10 +7,25 @@
   <style>
     body { font-family: Arial; padding: 20px; background: #f0f2f5; }
     h2 { color: #1e3a8a; }
-    #previewImg { display:block; margin-top:10px; max-width:200px; max-height:200px; border:1px solid #ccc; border-radius:8px; }
-    #status { margin-top:15px; font-weight:bold; }
-    button { margin-top:10px; padding:8px 15px; background:#2563eb; color:white; border:none; border-radius:5px; cursor:pointer; }
-    button:hover { background:#1d4ed8; }
+    #previewImg {
+      display: block;
+      margin-top: 10px;
+      max-width: 200px;
+      max-height: 200px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    #status { margin-top: 15px; font-weight: bold; }
+    button {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
@@ -24,8 +39,8 @@
 <button onclick="uploadPhoto()">Upload</button>
 <p id="status"></p>
 
+<!-- ✅ ONLY ONE SCRIPT TAG -->
 <script type="module" src="upload-photo.js"></script>
-</script>
 
 </body>
 </html>
