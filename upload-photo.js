@@ -9,58 +9,74 @@ import {
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
-  projectId: "student-management-syste-e3edc"
+  projectId: "student-management-syste-e3edc",
+  storageBucket: "student-management-syste-e3edc.appspot.com",
+  messagingSenderId: "674803364755",
+  appId: "1:674803364755:web:ffd5e3e3a852d3624fae66"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ================= ELEMENTS ================= */
-const photoInput = document.getElementById("photoInput");
-const uploadBtn = document.getElementById("uploadBtn");
-
 /* ================= CLOUDINARY ================= */
 const CLOUD_NAME = "drfbfelhl";
 const UPLOAD_PRESET = "student_photo_upload";
 
-uploadBtn.addEventListener("click", async () => {
+/* ================= ELEMENTS ================= */
+const photoInput = document.getElementById("photoInput");
+const previewImg = document.getElementById("previewImg");
+const statusEl = document.getElementById("status");
+
+/* ================= PREVIEW ================= */
+photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
-  if (!file) {
-    alert("Please select a photo");
+  if (!file || !file.type.startsWith("image/")) {
+    alert("Please select a valid image file");
+    photoInput.value = "";
     return;
   }
+  previewImg.src = URL.createObjectURL(file);
+});
+
+/* ================= UPLOAD FUNCTION ================= */
+window.uploadPhoto = async function () {
+  const file = photoInput.files[0];
+  if (!file) {
+    alert("Please select a photo first");
+    return;
+  }
+
+  statusEl.textContent = "Uploading...";
 
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", UPLOAD_PRESET);
-  formData.append("folder", "student-photos");
 
   try {
     const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData
-      }
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+      { method: "POST", body: formData }
     );
 
     const data = await res.json();
+    if (!data.secure_url) throw new Error("Upload failed");
 
-    if (!data.secure_url) {
-      throw new Error("Upload failed");
-    }
-
+    // ✅ UPDATE FIRESTORE
     const studentDocId = localStorage.getItem("studentDocId");
+    if (!studentDocId) throw new Error("Student ID missing");
 
     await updateDoc(doc(db, "Students", studentDocId), {
-      photoLocked: true,
-      photoURL: data.secure_url
+      photoUrl: data.secure_url,
+      photoLocked: true
     });
 
-    window.location.href = "student-dashboard.html";
+    statusEl.textContent = "Photo uploaded successfully!";
+    setTimeout(() => {
+      window.location.href = "student-dashboard.html";
+    }, 800);
 
   } catch (err) {
     console.error(err);
-    alert("Photo upload failed");
+    statusEl.textContent = "Upload failed";
   }
-});
+};
