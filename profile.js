@@ -1,13 +1,9 @@
 // ===== IMPORTS =====
-// Make sure your script tag in HTML uses type="module":
-// <script type="module" src="profile.js"></script>
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ===============================
-   FIREBASE CONFIG
-================================ */
+/* ================= FIREBASE CONFIG ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -21,9 +17,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ===============================
-   HELPERS
-================================ */
+/* ================= HELPERS ================= */
 const setText = (id, value) => {
   const el = document.getElementById(id);
   if (el) el.innerText = value || "-";
@@ -32,51 +26,40 @@ const setText = (id, value) => {
 const setImage = (id, url) => {
   const el = document.getElementById(id);
   if (!el) return;
-
-  if (url) {
-    let link = url;
-    if (link.includes("drive.google.com")) {
-      const match = link.match(/[-\w]{25,}/);
-      if (match) {
-        link = `https://drive.google.com/uc?export=view&id=${match[0]}`;
-      }
-    }
-    el.src = link;
-  } else {
-    el.src = "default-avatar.png"; // fallback avatar
-  }
+  el.src = url || "default-avatar.png";
 };
 
-// Format DOB like 01 Jan 2003
 const formatDOB = (dobStr) => {
   if (!dobStr) return "-";
-  const date = new Date(dobStr);
-  if (isNaN(date)) return dobStr; // fallback if invalid
-  const options = { day: "2-digit", month: "short", year: "numeric" };
-  return date.toLocaleDateString("en-US", options);
+  const d = new Date(dobStr);
+  if (isNaN(d)) return dobStr;
+  return d.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
 };
 
-/* ===============================
-   AUTH + LOAD PROFILE DATA
-================================ */
+/* ================= LOAD PROFILE ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
     return;
   }
 
-  let data = null;
-
   try {
-    // 1️⃣ Try email-based document ID
-    const docId = user.email.replace(/[@.]/g, "_");
-    const ref = doc(db, "Students", docId);
-    const snap = await getDoc(ref);
+    let data = null;
 
-    if (snap.exists()) {
-      data = snap.data();
-    } else {
-      // 2️⃣ Fallback: query by email field
+    // ✅ 1️⃣ ALWAYS TRY STORED DOC ID FIRST
+    const storedDocId = localStorage.getItem("studentDocId");
+
+    if (storedDocId) {
+      const snap = await getDoc(doc(db, "Students", storedDocId));
+      if (snap.exists()) data = snap.data();
+    }
+
+    // 🔁 2️⃣ FALLBACK: QUERY BY EMAIL
+    if (!data) {
       const q = query(
         collection(db, "Students"),
         where("email", "==", user.email)
@@ -87,7 +70,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!data) return;
 
-    // ===== PERSONAL INFO =====
+    // ===== PERSONAL =====
     setText("name", data.name);
     setText("cardName", data.name);
     setText("dob", formatDOB(data.dob));
@@ -96,7 +79,7 @@ onAuthStateChanged(auth, async (user) => {
     setText("phone", data.phone);
     setText("address", data.address);
 
-    // ===== ACADEMIC DETAILS =====
+    // ===== ACADEMIC =====
     setText("program", data.program);
     setText("program2", data.program);
     setText("batchYear", data.batchYear);
@@ -106,14 +89,14 @@ onAuthStateChanged(auth, async (user) => {
     setText("studentId", data.studentId);
     setText("modeOfStudy", data.modeOfStudy);
 
-    // ===== PARENTS / GUARDIAN =====
+    // ===== GUARDIAN =====
     setText("fatherName", data.fatherName);
     setText("fatherPhone", data.fatherPhone);
     setText("motherName", data.motherName);
     setText("motherPhone", data.motherPhone);
     setText("guardian", data.guardian);
 
-    // ===== PROFILE PHOTOS =====
+    // ✅ PROFILE PHOTO (NOW WORKS)
     setImage("profilePhoto", data.photoUrl);
     setImage("navPhoto", data.photoUrl);
 
