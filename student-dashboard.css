@@ -89,7 +89,7 @@ body {
 /* FIXED LOGOUT BUTTON */
 #logoutBtn {
   margin-top: 20px;
-  background: #dc2626;
+  background: none;
   color: white;
 }
 
