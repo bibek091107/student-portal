@@ -1,16 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* ================= FIREBASE CONFIG ================= */
+/* ================= FIREBASE ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCqAA39CbpDLXRU9OQ4T1TaKDGs_iPPceE",
   authDomain: "student-management-syste-e3edc.firebaseapp.com",
@@ -33,29 +25,28 @@ const photoInput = document.getElementById("photoInput");
 const previewImg = document.getElementById("previewImg");
 const statusEl = document.getElementById("status");
 
-/* ================= AUTH CHECK ================= */
-let studentDocRef = null;
+let studentRef = null;
 
+/* ================= AUTH CHECK ================= */
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "studentlogin.html";
     return;
   }
 
-  const docId = user.email.replace(/[@.]/g, "_");
-  studentDocRef = doc(db, "Students", docId);
+  const email = user.email.toLowerCase();
+  const docId = email.replace(/[@.]/g, "_");
 
-  const snap = await getDoc(studentDocRef);
+  studentRef = doc(db, "Students", docId);
+
+  const snap = await getDoc(studentRef);
 
   if (!snap.exists()) {
-    alert("Student record not found");
+    alert("Student document not found");
     return;
   }
 
-  const data = snap.data();
-
-  // 🚫 Already uploaded → block page
-  if (data.photoLocked === true) {
+  if (snap.data().photoLocked === true) {
     window.location.href = "student-dashboard.html";
   }
 });
@@ -63,23 +54,25 @@ onAuthStateChanged(auth, async (user) => {
 /* ================= PREVIEW ================= */
 photoInput.addEventListener("change", () => {
   const file = photoInput.files[0];
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    alert("Only image files allowed");
+  if (!file || !file.type.startsWith("image/")) {
+    alert("Select a valid image");
     photoInput.value = "";
     previewImg.src = "";
     return;
   }
-
   previewImg.src = URL.createObjectURL(file);
 });
 
 /* ================= UPLOAD ================= */
 window.uploadPhoto = async function () {
+  if (!studentRef) {
+    alert("Auth not ready");
+    return;
+  }
+
   const file = photoInput.files[0];
   if (!file) {
-    alert("Please select a photo");
+    alert("Select a photo first");
     return;
   }
 
@@ -96,25 +89,25 @@ window.uploadPhoto = async function () {
     );
 
     const data = await res.json();
+    if (!data.secure_url) throw new Error("Cloudinary upload failed");
 
-    if (!data.secure_url) {
-      throw new Error("Upload failed");
-    }
+    console.log("Uploading Firestore update...");
 
-    // ✅ LOCK PHOTO IN FIRESTORE
-    await updateDoc(studentDocRef, {
+    await updateDoc(studentRef, {
       photoUrl: data.secure_url,
       photoLocked: true
     });
 
-    statusEl.textContent = "Photo uploaded successfully!";
+    console.log("Firestore updated successfully");
 
+    statusEl.textContent = "Upload successful!";
     setTimeout(() => {
       window.location.href = "student-dashboard.html";
     }, 800);
 
   } catch (err) {
     console.error(err);
-    statusEl.textContent = "Upload error!";
+    statusEl.textContent = "Upload failed!";
+    alert(err.message);
   }
 };
