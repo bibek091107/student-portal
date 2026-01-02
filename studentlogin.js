@@ -57,7 +57,7 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     let email = identifier;
 
-    // ---- LOGIN WITH PHONE NUMBER ----
+    // ---- LOGIN WITH PHONE ----
     if (/^\d+$/.test(identifier)) {
       const phoneSnap = await getDocs(
         query(collection(db, "Students"), where("phone", "==", identifier))
@@ -74,10 +74,8 @@ loginForm.addEventListener("submit", async (e) => {
     email = email.toLowerCase();
     currentUserEmail = email;
 
-    // ---- AUTH LOGIN ----
     await signInWithEmailAndPassword(auth, email, password);
 
-    // ---- GET STUDENT DOCUMENT ----
     const studentSnap = await getDocs(
       query(collection(db, "Students"), where("email", "==", email))
     );
@@ -91,26 +89,19 @@ loginForm.addEventListener("submit", async (e) => {
     const studentData = studentDoc.data();
     currentStudentDocId = studentDoc.id;
 
-    // ✅ Save to localStorage for upload-photo.js
     localStorage.setItem("studentEmail", currentUserEmail);
     localStorage.setItem("studentDocId", currentStudentDocId);
 
-    const isFirstLogin =
-      studentData.firstLogin === true ||
-      studentData.firstLogin === undefined;
-
-    // 🚫 If photo already uploaded → dashboard
+    // ✅ FINAL FLOW
     if (studentData.photoLocked === true) {
       window.location.href = "student-dashboard.html";
       return;
     }
 
-    // 🔐 First login → change password
-    if (isFirstLogin) {
+    if (studentData.firstLogin === true) {
       loginContainer.style.display = "none";
       changePasswordContainer.style.display = "block";
     } else {
-      // 🔁 Password done but photo not uploaded
       window.location.href = "upload-photo.html";
     }
 
@@ -143,14 +134,10 @@ changePasswordForm.addEventListener("submit", async (e) => {
 
     await updatePassword(user, newPassword);
 
-    // ✅ Mark password updated but photo still required
     await updateDoc(doc(db, "Students", currentStudentDocId), {
       firstLogin: false
     });
 
-    alert("Password updated successfully");
-    
-    // Redirect to upload-photo.html instead of dashboard
     window.location.href = "upload-photo.html";
 
   } catch (err) {
